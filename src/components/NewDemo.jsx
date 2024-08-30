@@ -18,6 +18,10 @@ const MyDateCustomCell = props => <CustomCell {...props} color="lightblue" />;
 
 const NewDemo = () => {
   const [data, setData] = React.useState([]);
+  const [client,setClient] = React.useState(null);
+  const [project,setProject] = React.useState(null);
+  const [task,setTask] = React.useState(null);
+
   React.useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("http://127.0.0.1:5000/taskhourslist", {
@@ -73,6 +77,7 @@ const NewDemo = () => {
         // Remove the id before adding the new item
         delete dataItem.id;
         console.log('Adding new item:', dataItem);
+        dataItem.start_date = dataItem.start_date.toISOString().split('T')[0];
         let updatedDataItem = {
             ...dataItem,
             values: [
@@ -190,7 +195,7 @@ const NewDemo = () => {
       )}
     </td>
   );
-
+  console.log('data',task,client,project);
   return (
     <div>
       <Grid
@@ -203,7 +208,7 @@ const NewDemo = () => {
             text: MyInputCustomCell,
             numeric: MyNumericCustomCell,
             boolean: MyBooleanCustomCell,
-            date: MyDateCustomCell
+              date: MyDateCustomCell
           }
         }}
       >
@@ -213,9 +218,9 @@ const NewDemo = () => {
           </Button>
         </GridToolbar>
         <Column field="new_id" title="Id" editable={false} width={"50px"}/>
-        <Column field="client_name" title="Client Name" cell={DropDownCell} editor='text' />
-        <Column field="project_name" title="Project Name" cell={ProjectDropDownCell} editor="text" />
-        <Column field="task_name" title="Task Name" cell={TaskDropDownCell} editor="text" />
+        <Column field="client_name" title="Client Name" cell={props=><DropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor='text' />
+        <Column field="project_name" title="Project Name" cell={props=><ProjectDropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor="text" />
+        <Column field="task_name" title="Task Name" cell={props=><TaskDropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor="text" />
         <Column field="mon" title="Mon" editor="numeric" />
         <Column field="tue" title="Tue" editor="numeric" />
         <Column field="wed" title="Wed" editor="numeric" />

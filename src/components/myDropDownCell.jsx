@@ -47,28 +47,27 @@ const dataItemClients = metadata.clients
       }
     )
   })
-  console.log(metadata)
-  console.log(dataClients)
-  console.log(dataClients);
-  console.log(dataProjects);
-  console.log(dataTasks);
+  console.log('metadata',metadata)
+  console.log('dataclients',dataClients)
+  console.log('dataProjects',dataProjects);
+  console.log('dataTasks',dataTasks);
 
 
-export const DropDownCell = props => {
+export const DropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask }) => {
   const handleChange = e => {
-    if (props.onChange) {
-      props.onChange({
+    if (onChange) {
+      onChange({
         dataIndex: 0,
-        dataItem: props.dataItem,
-        field: props.field,
+        dataItem: dataItem,
+        field: field,
         syntheticEvent: e.syntheticEvent,
         value: e.target.value.value
       });
     }
+    setClient(e.target.value.value)
+    setProject(null)
+    setTask(null)
   };
-
-  const { dataItem } = props;
-  const field = props.field || '';
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
   return (
@@ -77,7 +76,7 @@ export const DropDownCell = props => {
         <DropDownList
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={dataClients.find(c => c.value === dataValue)}
+          value={dataClients.find(c => c.value === client)}
           data={dataClients}
           textField="text"
           dataItemKey="value"
@@ -91,7 +90,7 @@ export const DropDownCell = props => {
   );
 };
 
-export const ProjectDropDownCell = ({ dataItem, field, onChange }) => {
+export const ProjectDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask }) => {
   const handleChange = e => {
     if (onChange) {
       onChange({
@@ -102,10 +101,13 @@ export const ProjectDropDownCell = ({ dataItem, field, onChange }) => {
         value: e.target.value.value
       });
     }
+    setProject(e.target.value.value)
+    setClient(e.target.value.client_id)
+    setTask(null)
   };
 
   const selectedClient = dataItem.client_name;
-  const filteredProjects = dataProjects.filter(p => p.client_id === selectedClient);
+  const filteredProjects = dataProjects.filter(p => p.client_id === client);
 
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
@@ -115,8 +117,8 @@ export const ProjectDropDownCell = ({ dataItem, field, onChange }) => {
         <DropDownList
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={filteredProjects.find(p => p.value === dataValue)}
-          data={filteredProjects}
+          value={dataProjects.find(p => p.value === project)}
+          data={client ? filteredProjects : dataProjects}
           textField="text"
           dataItemKey="value"
         />
@@ -129,7 +131,7 @@ export const ProjectDropDownCell = ({ dataItem, field, onChange }) => {
   );
 };
 
-export const TaskDropDownCell = ({ dataItem, field, onChange }) => {
+export const TaskDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask }) => {
   const handleChange = e => {
     if (onChange) {
       onChange({
@@ -139,12 +141,16 @@ export const TaskDropDownCell = ({ dataItem, field, onChange }) => {
         syntheticEvent: e.syntheticEvent,
         value: e.target.value.value
       });
+      setTask(e.target.value.value)
+      setProject(e.target.value.project_id)
+      setClient(e.target.value.client_id)
     }
+
   };
 
   const selectedClient = dataItem.client_name;
   const selectedProject = dataItem.project_name;
-  const filteredTasks = dataTasks.filter(t => t.client_id === selectedClient && t.project_id === selectedProject);
+  const filteredTasks = dataTasks.filter(t => t.client_id === client && t.project_id === project);
 
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
@@ -154,8 +160,8 @@ export const TaskDropDownCell = ({ dataItem, field, onChange }) => {
         <DropDownList
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={filteredTasks.find(t => t.value === dataValue)}
-          data={filteredTasks}
+          value={dataTasks.find(t => t.value === task)}
+          data={(client && project) ? filteredTasks : client ? dataTasks.filter(t => t.client_id === client) : dataTasks}
           textField="text"
           dataItemKey="value"
         />
