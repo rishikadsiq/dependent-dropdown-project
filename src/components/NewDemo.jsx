@@ -40,7 +40,53 @@ const NewDemo = () => {
     fetchData();
   }, []);
 
-  const enterInsert = () => {
+  const enterInsert = async () => {
+    const fetchMetaData = async () => {
+      const response = await fetch("http://127.0.0.1:5000/metadata", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      const metadata = await response.json();
+      const dataClients = metadata.clients
+      const dataProjects = metadata.projects
+      const dataTasks = metadata.tasks
+      const updatedClients = dataClients.map(client => {
+        return (
+          {
+            value: client.id,
+            text: client.name
+          }
+        )
+        
+      })
+      const updatedProjects = dataProjects.map(project => {
+        return (
+          {
+            client_id: project.client_id,
+            value: project.id,
+            text: project.name
+          }
+        )
+      })
+      const updatedTasks = dataTasks.map(task => {
+        return (
+          {
+            project_id: task.project_id,
+            value: task.id,
+            text: task.name,
+            client_id: task.client_id
+          }
+        )
+      })
+      console.log(metadata)
+      console.log(dataClients)
+      console.log(updatedClients);
+      console.log(updatedProjects);
+      console.log(updatedTasks);
+    }
+    fetchMetaData()
     const dataItem = {
       id: undefined, // No id assigned until saved
       client_name: '',
