@@ -3,27 +3,56 @@ import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
 
-// Dropdown data for client names
-const dataClients = [
-  { value: 'a09d4044-c87f-494a-91a7-43176d697a87', text: 'client1' },
-  { value: 'c2cefd50-b670-4b33-a74a-f4e75814b686', text: 'client2' },
-  { value: '4eae71ab-fdcd-40f3-9233-4f71aad812eb', text: 'client3' }
-];
+const fetchMetaData = async () => {
+  const response = await fetch("http://127.0.0.1:5000/metadata", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+  const metadata = await response.json();
+  console.log(metadata);
+  return metadata
+}
+const metadata = await fetchMetaData()
+console.log(metadata);
+const dataItemClients = metadata.clients
+  const dataItemProjects = metadata.projects
+  const dataItemTasks = metadata.tasks
+  const dataClients = dataItemClients.map(client => {
+    return (
+      {
+        value: client.id,
+        text: client.name
+      }
+    )
+    
+  })
+  const dataProjects = dataItemProjects.map(project => {
+    return (
+      {
+        client_id: project.client_id,
+        value: project.id,
+        text: project.name
+      }
+    )
+  })
+  const dataTasks = dataItemTasks.map(task => {
+    return (
+      {
+        project_id: task.project_id,
+        value: task.id,
+        text: task.name,
+        client_id: task.client_id
+      }
+    )
+  })
+  console.log(metadata)
+  console.log(dataClients)
+  console.log(dataClients);
+  console.log(dataProjects);
+  console.log(dataTasks);
 
-// Dropdown data for projects
-const dataProjects = [
-  { client_id: 'a09d4044-c87f-494a-91a7-43176d697a87', value: '5c20ef9a-df59-4262-a347-2ec32c81a6b0', text: 'project1' },
-  { client_id: 'a09d4044-c87f-494a-91a7-43176d697a87', value: '0a833389-be1e-4387-971f-dc52f2485c30', text: 'project2' },
-  { client_id: 'c2cefd50-b670-4b33-a74a-f4e75814b686', value: '1f71c999-f1cf-4677-a7b5-610be496ca8a', text: 'project12' },
-  { client_id: '4eae71ab-fdcd-40f3-9233-4f71aad812eb', value: 'ab333167-0c0d-45da-8a05-b1629ee5b64a', text: 'project11' }
-];
-
-// Dropdown data for tasks
-const dataTasks = [
-  { client_id: 'a09d4044-c87f-494a-91a7-43176d697a87', value: '7dc8214c-107f-438a-bbd9-ef6d4960c369', text: 'task1', project_id: '5c20ef9a-df59-4262-a347-2ec32c81a6b0' },
-  { client_id: 'a09d4044-c87f-494a-91a7-43176d697a87', value: 'ad5f91c3-e278-4e7e-9e0c-d82aa5fb7fa7', text: 'task2', project_id: '5c20ef9a-df59-4262-a347-2ec32c81a6b0' },
-  { client_id: 'a09d4044-c87f-494a-91a7-43176d697a87', value: '5a227528-8c9a-4bc7-86fe-0bf5c218d8fa', text: 'task12', project_id: '0a833389-be1e-4387-971f-dc52f2485c30' }
-];
 
 export const DropDownCell = props => {
   const handleChange = e => {
