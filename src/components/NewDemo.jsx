@@ -121,6 +121,25 @@ const NewDemo = () => {
                 const data = await response.json();
                 console.log("Response from server:", data);
                 
+                const fetchData = async () => {
+                  const response = await fetch("http://127.0.0.1:5000/taskhourslist", {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  });
+                  const data = await response.json();
+                  console.log(data)
+                  const updatedData = data.map((item, index) => ({
+                    ...item, // Spread the other properties
+                    new_id: index+1,
+                    start_date: new Date(item.start_date) // Convert start_date to Date object
+                  }));
+                  console.log(updatedData);
+                  
+                  setData(updatedData || []);
+                }
+                fetchData();
               // Optionally, update the UI with the new id or other server responses
             } else {
               console.error("Failed to add data:", response.statusText);
@@ -153,8 +172,41 @@ const NewDemo = () => {
     }
   };
 
-  const remove = dataItem => {
-    setData(data.filter(item => item.id !== dataItem.id));
+  const remove = async dataItem => {
+    console.log(dataItem.id)
+    const response = await fetch("http://127.0.0.1:5000/deletetaskhours", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({"id": dataItem.id})  // Send dataItem in request body
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Response from server:", data);
+      
+      const fetchData = async () => {
+        const response = await fetch("http://127.0.0.1:5000/taskhourslist", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await response.json();
+        console.log(data)
+        const updatedData = data.map((item, index) => ({
+          ...item, // Spread the other properties
+          new_id: index+1,
+          start_date: new Date(item.start_date) // Convert start_date to Date object
+        }));
+        console.log(updatedData);
+        
+        setData(updatedData || []);
+      }
+      fetchData();
+    // Optionally, update the UI with the new id or other server responses
+    }
+    // setData(data.filter(item => item.id !== dataItem.id));
   };
 
   const itemChange = event => {
@@ -195,7 +247,6 @@ const NewDemo = () => {
       )}
     </td>
   );
-  console.log('data',task,client,project);
   return (
     <div>
       <Grid
@@ -221,15 +272,15 @@ const NewDemo = () => {
         <Column field="client_name" title="Client Name" cell={props=><DropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor='text' />
         <Column field="project_name" title="Project Name" cell={props=><ProjectDropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor="text" />
         <Column field="task_name" title="Task Name" cell={props=><TaskDropDownCell {...props} project={project} task={task} client={client} setClient={setClient} setProject={setProject} setTask={setTask} />} editor="text" />
-        <Column field="mon" title="Mon" editor="numeric" />
-        <Column field="tue" title="Tue" editor="numeric" />
-        <Column field="wed" title="Wed" editor="numeric" />
-        <Column field="thu" title="Thu" editor="numeric" />
-        <Column field="fri" title="Fri" editor="numeric" />
-        <Column field="sat" title="Sat" editor="numeric" />
-        <Column field="sun" title="Sun" editor="numeric" />
+        <Column field="mon" title="Mon" editor="numeric" width={"80px"}/>
+        <Column field="tue" title="Tue" editor="numeric" width={"80px"}/>
+        <Column field="wed" title="Wed" editor="numeric" width={"80px"}/>
+        <Column field="thu" title="Thu" editor="numeric" width={"80px"}/>
+        <Column field="fri" title="Fri" editor="numeric" width={"80px"}/>
+        <Column field="sat" title="Sat" editor="numeric" width={"80px"}/>
+        <Column field="sun" title="Sun" editor="numeric" width={"80px"}/>
         <Column field="start_date" title="Start Date" editor="date" format="{0:d}" />
-        <Column cell={MyCommandCell} width="150px" />
+        <Column cell={MyCommandCell} width="140px" />
       </Grid>
     </div>
   );
