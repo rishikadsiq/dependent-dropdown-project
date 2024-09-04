@@ -1,15 +1,13 @@
-// import Demo from './components/Demo'
 import Container from 'react-bootstrap/Container';
-import NewDemo from './components/NewDemo';
-// import NewDemoDemo from './components/myDropDownCell';
+import Clients from './components/clients/Clients';
+// import NewDemo from './components/taskhours/NewDemo';
 function App() {
   
 
   return (
     <Container>
-      {/* <Demo /> */}
-      <NewDemo />
-      {/* <NewDemoDemo /> */}
+      {/* <NewDemo /> */}
+      <Clients />
     </Container>
   )
 }
