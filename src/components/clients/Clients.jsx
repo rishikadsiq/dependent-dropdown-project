@@ -1,152 +1,181 @@
 import * as React from 'react';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
-import { MyCommandCell } from './shared-gd-myCommandCell';
-import { Button } from '@progress/kendo-react-buttons';
-import { insertItem, getItems, updateItem, deleteItem } from './shared-gd-services';
-import ClientAddForm from './ClientAddForm';
+import { Button } from "@progress/kendo-react-buttons";
+import {GetRequestHelper} from '../helper/GetRequestHelper'
+import { PostRequestHelper } from '../helper/PostRequestHelper';
+import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 
-const GridContext = React.createContext({});
-const CommandCell = props => {
-  const {
-    enterEdit,
-    remove,
-    add,
-    discard,
-    update,
-    cancel,
-    editField
-  } = React.useContext(GridContext);
-  return <MyCommandCell {...props} edit={enterEdit} remove={remove} add={add} discard={discard} update={update} cancel={cancel} editField={editField} />;
+import EditForm from './editForm';
+const EditCommandCell = props => {
+  return <td>
+            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+                Edit
+            </Button>
+            <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
+                Delete
+            </Button>
+        </td>;
 };
-const App = () => {
-  const editField = 'inEdit';
-  const [data, setData] = React.useState([
-    {
-        "email": "pwer1221@gmail.com",
-        "id": "286b7aef-a104-4da0-9b2d-fa90aa5dbe15",
-        "is_active": true,
-        "name": "client2 ytfrtcvt",
-        "phone": null
+const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
+const Clients = () => {
+    const [openForm, setOpenForm] = React.useState(false);
+    const [editItem, setEditItem] = React.useState({
+        id: 1
+    });
+    const [data, setData] = React.useState([]);
+    const [openDialog, setOpenDialog] = React.useState(false);
+    const [selectedItem, setSelectedItem] = React.useState(null);
+
+
+  const getListing = async() => {
+    try {
+        const data1 = await GetRequestHelper('clientlist');
+        console.log(data1);
+        if (data1.status === 404) {
+            setData([]);
+        } else {
+            setData(data1.clients);
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        setData([]); // Handle error case by setting an empty array or some default data
     }
-]);
-  const [openForm, setOpenForm] = React.useState(false);
-  const [editItem, setEditItem] = React.useState({
-    id: 1,
-  });
+};
 
-  // modify the data in the store, db etc
-  const remove = dataItem => {
-    const newData = deleteItem(dataItem);
-    setData([...newData]);
-  };
-  const add = dataItem => {
-    dataItem.inEdit = true;
-    const newData = insertItem(dataItem);
-    setData(newData);
-  };
-  const update = dataItem => {
-    dataItem.inEdit = false;
-    const newData = updateItem(dataItem);
-    setData(newData);
-  };
+  React.useEffect(() => {
+    getListing(); // Call the function to fetch data
+}, []);
 
-  // Local state operations
-  const discard = dataItem => {
-    const newData = [...data];
-    newData.splice(0, 1);
-    setData(newData);
-  };
-  const cancel = dataItem => {
-    const originalItem = getItems().find(p => p.id === dataItem.id);
-    const newData = data.map(item => item.id === originalItem.id ? originalItem : item);
-    setData(newData);
-  };
-  const enterEdit = dataItem => {
-    let newData = data.map(item => item.id === dataItem.id ? {
-      ...item,
-      inEdit: true
-    } : item);
-    setData(newData);
-  };
-  const itemChange = event => {
-    const field = event.field || '';
-    const newData = data.map(item => item.id === event.dataItem.id ? {
-      ...item,
-      [field]: event.value
-    } : item);
-    setData(newData);
-  };
-  
-  const handleOpenForm = () => {
-    console.log("Open Form");
+
+  const enterEdit = item => {
     setOpenForm(true);
-  }
+    setEditItem(item);
+  };
 
+    const deleteItem = dataItem => {
+        return data.filter(item => item.id !== dataItem.id);
+    };
+  const onDeleteData = async () => {
+    setOpenDialog(false);
 
-  const handleSubmit = (event) => {
+    // You can make a request to the backend to delete the item here
+    try {
+        const response = await PostRequestHelper('deleteclient', { id: selectedItem.id });
+        console.log(response);
+    } catch (err) {
+        console.error('Error deleting data:', err);
+    }
+    setOpenDialog(false)
+    getListing()
+    };
+
+    const toggleDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const remove = (dataItem) => {
+        setSelectedItem(dataItem);
+        setOpenDialog(true);
+    };
+
+  const handleSubmit = event => {
     let newItem = true;
-    let newData = data.map((item) => {
+    let newData = data.map(item => {
       if (event.id === item.id) {
         newItem = false;
         item = {
-          ...event,
+          ...event
         };
       }
       return item;
     });
     if (newItem) {
-      newData.push(event);
+        console.log(event)
+    //   newData.push(event);
+        const fetchData = async() => {
+            try {
+                delete event.id
+                console.log(event);
+                
+                const data1 = await PostRequestHelper('addclient', event);
+                console.log(data1);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            }
+        }
+        fetchData(); // Call the function to fetch data
+    } else {
+        const fetchData = async() => {
+            try {
+                console.log(event);
+                const orignalData = data.find(item => item.id ===event.id);
+
+                    // Function to find changed properties in the event object compared to orignalData
+                    function getChangedData(original, updated) {
+                      const changedData = {};
+                      Object.keys(updated).forEach(key => {
+                        if (updated[key] !== original[key]) {
+                          changedData[key] = updated[key];
+                        }
+                      });
+                      return changedData;
+                    }
+                  
+                    const changedData = getChangedData(orignalData, event);
+                    changedData['id'] = event.id;
+                console.log(changedData) 
+                const data1 = await PostRequestHelper('updateclient', changedData);
+                console.log(data1);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            }
+        }
+        fetchData();
     }
-    setData(newData);
+    getListing()
     setOpenForm(false);
   };
-
-
+  const addNew = () => {
+    setOpenForm(true);
+    setEditItem({
+      id: 99
+    }); // you need to change the logic for adding unique ID value;
+  };
   const handleCancelEdit = () => {
     setOpenForm(false);
   };
+  return <React.Fragment>
+            <Grid data={data}>
+                <GridToolbar>
+                    <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
+                        Add new
+                    </Button>
+                </GridToolbar>
+                <Column field="id" title="ID" />
+                <Column field='name' title='Client Name' />
+                <Column field='email' title='Email' />
+                <Column field='phone' title='Contact' />
+                <Column field='is_active' title='Active' />
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
+            </Grid>
+            {openForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
+            {openDialog && (
+                <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
+                    <div>
+                        Are you sure you want to delete the client {selectedItem?.name} with ID {selectedItem?.id}?
+                    </div>
+                    <DialogActionsBar>
+                        <Button onClick={onDeleteData}>Delete</Button>
+                        <Button onClick={toggleDialog}>Cancel</Button>
+                    </DialogActionsBar>
+                </Dialog>
+            )}
 
-  // React.useState(() => {
-  //   const getDataLength = () => {
-  //     return data.length;
-  //   };
-  //   setEditItem(getDataLength()+1)
-  // },[data])
-
-
-
-  return <GridContext.Provider value={{
-    enterEdit,
-    remove,
-    add,
-    discard,
-    update,
-    cancel,
-    editField
-  }}>
-      <Grid data={data} onItemChange={itemChange} editField={editField} dataItemKey={'id'}>
-        <GridToolbar>
-          <Button title="Add new" themeColor={'primary'} type="button" onClick={handleOpenForm}>
-            Add new
-          </Button>
-        </GridToolbar>
-        <Column field="id" title="Id" width="50px" editable={false} />
-        <Column field="name" title="Client Name" />
-        <Column field="email" title="Email" />
-        <Column field="phone" title="Contact" />
-        <Column field='is_active' title="Active" editor='boolean'/>
-        {/* <Column field="UnitPrice" title="Price" editor="numeric" />
-        <Column field="UnitsInStock" title="Units" editor="numeric" /> */}
-        {/* <Column field="CategoryName" title="Category Name" cell={DropDownCell} /> */}
-        <Column title="Actions" cell={CommandCell} width="240px" />
-      </Grid>
-      {openForm && (
-        <ClientAddForm
-        cancelEdit={handleCancelEdit}
-        onSubmit={handleSubmit}
-        item={editItem}
-        />
-      )}
-    </GridContext.Provider>;
+            <style>
+                {`.k-animation-container {
+                    z-index: 10003;
+                }`}
+            </style>
+        </React.Fragment>;
 };
-export default App;
+export default Clients;

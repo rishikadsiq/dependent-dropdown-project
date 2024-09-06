@@ -3,8 +3,24 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-const ClientAddForm = props => {
-  return <Dialog title={`Add Client`} onClose={props.cancelEdit}>
+import { Error } from "@progress/kendo-react-labels";
+
+const EditForm = props => {
+
+  const emailRegex = new RegExp(/\S+@\S+\.\S+/);
+  const emailValidator = (value) =>
+    emailRegex.test(value) ? "" : "Please enter a valid email.";
+  const EmailInput = (fieldRenderProps) => {
+    const { validationMessage, visited, ...others } = fieldRenderProps;
+    return (
+      <div>
+        <Input {...others} />
+        {visited && validationMessage && <Error>{validationMessage}</Error>}
+      </div>
+    );
+  };
+
+  return <Dialog title={`Edit Client`} onClose={props.cancelEdit}>
         <Form onSubmit={props.onSubmit} initialValues={props.item} render={formRenderProps => <FormElement style={{
       maxWidth: 650
     }}>
@@ -16,7 +32,13 @@ const ClientAddForm = props => {
                   <Field name={"lastname"} component={Input} label={"Last Name"} />
                 </div>
                 <div className="mb-3">
-                  <Field name={"email"} component={Input} label={"Email"} />
+                  <Field
+                    name={"email"}
+                    type={"email"}
+                    component={EmailInput}
+                    label={"Email *"}
+                    validator={emailValidator}
+                  />
                 </div>
                 <div className="mb-3">
                   <Field name={"phone"} component={Input} label={"Contact"} />
@@ -33,4 +55,4 @@ const ClientAddForm = props => {
             </FormElement>} />
       </Dialog>;
 };
-export default ClientAddForm;
+export default EditForm;
