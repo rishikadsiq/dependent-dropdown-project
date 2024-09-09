@@ -19,6 +19,9 @@ const EditForm = props => {
       </div>
     );
   };
+  
+  const requiredValidator = (value) =>
+    value ? "" : "Error: This field is required.";
 
   return <Dialog title={`Edit Client`} onClose={props.cancelEdit}>
         <Form onSubmit={props.onSubmit} initialValues={props.item} render={formRenderProps => <FormElement style={{
@@ -26,7 +29,7 @@ const EditForm = props => {
     }}>
               <fieldset className={"k-form-fieldset"}>
                 <div className="mb-3">
-                  <Field name={"firstname"} component={Input} label={"First Name"} />
+                  <Field name={"firstname"} component={Input} label={"First Name"} validator={requiredValidator}/>
                 </div>
                 <div className="mb-3">
                   <Field name={"lastname"} component={Input} label={"Last Name"} />
@@ -41,7 +44,7 @@ const EditForm = props => {
                   />
                 </div>
                 <div className="mb-3">
-                  <Field name={"phone"} component={Input} label={"Contact"} />
+                  <Field name={"phone"} component={Input} label={"Contact"} validator={requiredValidator}/>
                 </div>
               </fieldset>
               <div className="k-form-buttons">
