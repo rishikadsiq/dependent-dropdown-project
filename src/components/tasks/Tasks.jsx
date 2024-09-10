@@ -4,8 +4,9 @@ import { Button } from "@progress/kendo-react-buttons";
 import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
+import AddForm from './AddForm';
 import EditForm from './editForm';
-import AddClient from './AddClient';
+
 
 const EditCommandCell = props => {
   return <td>
@@ -18,9 +19,9 @@ const EditCommandCell = props => {
         </td>;
 };
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
-const Clients = () => {
-    const [openAddForm, setOpenAddForm] = React.useState(false);
+const Tasks = () => {
     const [openEditForm, setOpenEditForm] = React.useState(false);
+    const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
         id: 1
     });
@@ -31,12 +32,20 @@ const Clients = () => {
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('clientlist');
+        const data1 = await GetRequestHelper('tasklist');
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            setData(data1.clients);
+            console.log(data1)
+            const updatedData = data1.tasks.map((item, index) => ({
+                ...item, // Spread the other properties
+                start_date: item.start_date ? new Date(item.start_date) : null,
+                end_date: item.end_date ? new Date(item.end_date) : null,
+            }));
+            console.log(updatedData);
+            
+            setData(updatedData || []);
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -54,15 +63,11 @@ const Clients = () => {
     setEditItem(item);
   };
 
-    const deleteItem = dataItem => {
-        return data.filter(item => item.id !== dataItem.id);
-    };
+    
   const onDeleteData = async () => {
-    setOpenDialog(false);
-
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deleteclient', { id: selectedItem.id });
+        const response = await PostRequestHelper('deletetask', { id: selectedItem.id });
         console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
@@ -82,31 +87,23 @@ const Clients = () => {
 
   const handleSubmit = event => {
     let newItem = true;
-    let newData = data.map(item => {
-      if (event.id === item.id) {
-        newItem = false;
-        item = {
-          ...event
-        };
-      }
-      return item;
-    });
     if (newItem) {
         console.log(event)
-    //   newData.push(event);
         const fetchData = async() => {
             try {
                 delete event.id
                 console.log(event);
+                const updatedEvent = {...event, client_id: event.client_id.id}
+                console.log(updatedEvent)
                 
-                const data1 = await PostRequestHelper('addclient', event);
+                const data1 = await PostRequestHelper('addtask', updatedEvent);
                 console.log(data1);
-                setOpenAddForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
         }
         fetchData(); // Call the function to fetch data
+        setOpenAddForm(false)
     } else {
         const fetchData = async() => {
             try {
@@ -127,7 +124,7 @@ const Clients = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updateclient', changedData);
+                const data1 = await PostRequestHelper('updatetask', changedData);
                 console.log(data1);
                 setOpenEditForm(false);
             } catch (err) {
@@ -137,12 +134,11 @@ const Clients = () => {
         fetchData();
     }
     getListing()
-    
   };
   const addNew = () => {
     setOpenAddForm(true);
     setEditItem({
-      id: 99
+      id: undefined
     }); // you need to change the logic for adding unique ID value;
   };
   const handleCancelEdit = () => {
@@ -157,18 +153,20 @@ const Clients = () => {
                     </Button>
                 </GridToolbar>
                 <Column field="id" title="ID" />
-                <Column field='name' title='Client Name' />
-                <Column field='email' title='Email' />
-                <Column field='phone' title='Contact' />
+                <Column field='name' title='Task Name' />
+                <Column field='project_name' title='Project Name' />
+                <Column field='client_name' title='Client Name' />
+                <Column field='start_date' title='Start Date' format="{0:d}"/>
+                <Column field='end_date' title='End Date' format="{0:d}"/>
                 <Column field='is_active' title='Active' />
                 <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
             </Grid>
-            {openAddForm && <AddClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
+            {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (
                 <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
                     <div>
-                        Are you sure you want to delete the client {selectedItem?.name} with ID {selectedItem?.id}?
+                        Are you sure you want to delete the task {selectedItem?.name} with ID {selectedItem?.id}?
                     </div>
                     <DialogActionsBar>
                         <Button onClick={onDeleteData}>Delete</Button>
@@ -184,4 +182,4 @@ const Clients = () => {
             </style>
         </React.Fragment>;
 };
-export default Clients;
+export default Tasks;

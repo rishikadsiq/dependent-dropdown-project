@@ -4,6 +4,7 @@ import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
 import { Error } from "@progress/kendo-react-labels";
+import { Checkbox } from "@progress/kendo-react-inputs"
 
 const EditForm = props => {
 
@@ -19,17 +20,31 @@ const EditForm = props => {
       </div>
     );
   };
-  
   const requiredValidator = (value) =>
     value ? "" : "Error: This field is required.";
+  
 
-  return <Dialog title={`Edit Client`} onClose={props.cancelEdit}>
+  const CheckBoxField = (fieldRenderProps) => (
+    <div>
+      <label className="k-label">{fieldRenderProps.label}</label>
+      <Checkbox
+        checked={fieldRenderProps.value}
+        onChange={(e) => fieldRenderProps.onChange({ value: e.target.checked })}
+        name={fieldRenderProps.name}
+      />
+      {fieldRenderProps.visited && fieldRenderProps.error && (
+        <div className="k-required">{fieldRenderProps.error}</div>
+      )}
+    </div>
+  );
+
+  return <Dialog title={`edit Client`} onClose={props.cancelEdit}>
         <Form onSubmit={props.onSubmit} initialValues={props.item} render={formRenderProps => <FormElement style={{
       maxWidth: 650
     }}>
               <fieldset className={"k-form-fieldset"}>
                 <div className="mb-3">
-                  <Field name={"firstname"} component={Input} label={"First Name"} validator={requiredValidator}/>
+                  <Field name={"firstname"} component={Input} label={"First Name *"} validator={requiredValidator}/>
                 </div>
                 <div className="mb-3">
                   <Field name={"lastname"} component={Input} label={"Last Name"} />
@@ -45,6 +60,13 @@ const EditForm = props => {
                 </div>
                 <div className="mb-3">
                   <Field name={"phone"} component={Input} label={"Contact"} validator={requiredValidator}/>
+                </div>
+                <div className="mb-3">
+                  <Field  
+                    name={"is_active"}
+                    label={"Active"}
+                    component={CheckBoxField} 
+                  />
                 </div>
               </fieldset>
               <div className="k-form-buttons">

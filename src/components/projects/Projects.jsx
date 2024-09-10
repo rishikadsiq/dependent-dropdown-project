@@ -4,8 +4,10 @@ import { Button } from "@progress/kendo-react-buttons";
 import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-
+import AddForm from './AddForm';
 import EditForm from './editForm';
+
+
 const EditCommandCell = props => {
   return <td>
             <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
@@ -18,7 +20,8 @@ const EditCommandCell = props => {
 };
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Projects = () => {
-    const [openForm, setOpenForm] = React.useState(false);
+    const [openEditForm, setOpenEditForm] = React.useState(false);
+    const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
         id: 1
     });
@@ -37,9 +40,8 @@ const Projects = () => {
             console.log(data1)
             const updatedData = data1.projects.map((item, index) => ({
                 ...item, // Spread the other properties
-                new_id: index+1,
-                start_date: new Date(item.start_date), // Convert start_date to Date object
-                end_date: new Date(item.end_date)
+                start_date: item.start_date ? new Date(item.start_date) : null,
+                end_date: item.end_date ? new Date(item.end_date) : null,
             }));
             console.log(updatedData);
             
@@ -57,7 +59,7 @@ const Projects = () => {
 
 
   const enterEdit = item => {
-    setOpenForm(true);
+    setOpenEditForm(true);
     setEditItem(item);
   };
 
@@ -85,18 +87,8 @@ const Projects = () => {
 
   const handleSubmit = event => {
     let newItem = true;
-    let newData = data.map(item => {
-      if (event.id === item.id) {
-        newItem = false;
-        item = {
-          ...event
-        };
-      }
-      return item;
-    });
     if (newItem) {
         console.log(event)
-    //   newData.push(event);
         const fetchData = async() => {
             try {
                 delete event.id
@@ -111,6 +103,7 @@ const Projects = () => {
             }
         }
         fetchData(); // Call the function to fetch data
+        setOpenAddForm(false)
     } else {
         const fetchData = async() => {
             try {
@@ -133,6 +126,7 @@ const Projects = () => {
                 console.log(changedData) 
                 const data1 = await PostRequestHelper('updateproject', changedData);
                 console.log(data1);
+                setOpenEditForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
@@ -140,16 +134,16 @@ const Projects = () => {
         fetchData();
     }
     getListing()
-    setOpenForm(false);
   };
   const addNew = () => {
-    setOpenForm(true);
+    setOpenAddForm(true);
     setEditItem({
-      id: 99
+      id: undefined
     }); // you need to change the logic for adding unique ID value;
   };
   const handleCancelEdit = () => {
-    setOpenForm(false);
+    setOpenEditForm(false);
+    setOpenAddForm(false);
   };
   return <React.Fragment>
             <Grid data={data}>
@@ -161,12 +155,13 @@ const Projects = () => {
                 <Column field="id" title="ID" />
                 <Column field='name' title='Project Name' />
                 <Column field='client_name' title='Client Name' />
-                <Column field='start_date' title='Start Date' />
-                <Column field='end_date' title='End Date' />
+                <Column field='start_date' title='Start Date' format="{0:d}"/>
+                <Column field='end_date' title='End Date' format="{0:d}"/>
                 <Column field='is_active' title='Active' />
                 <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
             </Grid>
-            {openForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
+            {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
+            {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (
                 <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
                     <div>
