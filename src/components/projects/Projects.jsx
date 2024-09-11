@@ -87,6 +87,15 @@ const Projects = () => {
 
   const handleSubmit = event => {
     let newItem = true;
+    let newData = data.map(item => {
+        if (event.id === item.id) {
+          newItem = false;
+          item = {
+            ...event
+          };
+        }
+        return item;
+      });
     if (newItem) {
         console.log(event)
         const fetchData = async() => {
@@ -146,6 +155,9 @@ const Projects = () => {
     setOpenAddForm(false);
   };
   return <React.Fragment>
+            <div className='mt-3 mb-3'>
+                <h3>Projects</h3>
+            </div>
             <Grid data={data}>
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>

@@ -9,31 +9,11 @@ import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { AutoComplete } from "@progress/kendo-react-dropdowns";
 
 const EditForm = (props) => {
-  const [projectData, setProjectData] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
 
   // Validator function to ensure required fields are filled
   const requiredValidator = (value) => (value ? "" : "Error: This field is required.");
 
-  // Fetch client and project metadata
-  const getMetaData = async () => {
-    try {
-      const response = await GetRequestHelper("projectlist");
-      if (response.status === 404) {
-        setProjectData([]);
-      } else {
-        setProjectData(response.projects);
-      }
-    } catch (err) {
-      console.error("Error fetching metadata:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    getMetaData();
-  }, []);
+  
 
   // Custom rendering function for DatePicker component
   const DatePickerField = (fieldRenderProps) => (
@@ -56,47 +36,20 @@ const EditForm = (props) => {
   
 
   return (
-    <Dialog title={`Add Task`} onClose={props.cancelEdit}>
+    <Dialog title={`Add Timesheet`} onClose={props.cancelEdit}>
       <Form
         onSubmit={props.onSubmit}
-        initialValues={{ client_id: null, project_id: null, ...props.item }}
+        initialValues={{ ...props.item }}
         render={(formRenderProps) => (
           <FormElement style={{ maxWidth: 650 }}>
             <fieldset className={"k-form-fieldset"}>
+             
               <div className="mb-3">
                 <Field
-                  name={"name"}
-                  component={Input}
-                  label={"Task Name *"}
+                  name={"date"}
+                  label={"Date *"}
+                  component={DatePickerField}
                   validator={requiredValidator}
-                />
-              </div>
-              
-              <div className="mb-3">
-                {!loading && (
-                  <Field
-                    name={"project_id"}
-                    component={DropDownList}
-                    data={projectData}
-                    textField="name"
-                    dataItemKey="project_id"
-                    label="Project Name"
-                    validator={requiredValidator}
-                  />
-                )}
-              </div>
-              <div className="mb-3">
-                <Field
-                  name={"start_date"}
-                  label={"Start Date"}
-                  component={DatePickerField}
-                />
-              </div>
-              <div className="mb-3">
-                <Field
-                  name={"end_date"}
-                  label={"End Date"}
-                  component={DatePickerField}
                 />
               </div>
               

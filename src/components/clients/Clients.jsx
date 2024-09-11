@@ -150,6 +150,9 @@ const Clients = () => {
     setOpenAddForm(false);
   };
   return <React.Fragment>
+            <div className='mt-3 mb-3'>
+                <h3>Clients</h3>
+            </div>
             <Grid data={data}>
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>

@@ -19,7 +19,7 @@ const EditCommandCell = props => {
         </td>;
 };
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
-const Tasks = () => {
+const Timesheets = () => {
     const [openEditForm, setOpenEditForm] = React.useState(false);
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
@@ -32,13 +32,13 @@ const Tasks = () => {
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('tasklist');
+        const data1 = await GetRequestHelper('timesheetlist');
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
             console.log(data1)
-            const updatedData = data1.tasks.map((item, index) => ({
+            const updatedData = data1.timesheets.map((item, index) => ({
                 ...item, // Spread the other properties
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
@@ -67,7 +67,7 @@ const Tasks = () => {
   const onDeleteData = async () => {
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deletetask', { id: selectedItem.id });
+        const response = await PostRequestHelper('deletetimesheet', { id: selectedItem.id });
         console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
@@ -102,10 +102,10 @@ const Tasks = () => {
             try {
                 delete event.id
                 console.log(event);
-                const updatedEvent = {...event, project_id: event.project_id.id}
+                const updatedEvent = {...event}
                 console.log(updatedEvent)
                 
-                const data1 = await PostRequestHelper('addtask', updatedEvent);
+                const data1 = await PostRequestHelper('addtimesheet', updatedEvent);
                 console.log(data1);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -133,7 +133,7 @@ const Tasks = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updatetask', changedData);
+                const data1 = await PostRequestHelper('updatetimesheet', changedData);
                 console.log(data1);
                 setOpenEditForm(false);
             } catch (err) {
@@ -156,7 +156,7 @@ const Tasks = () => {
   };
   return <React.Fragment>
      <      div className='mt-3 mb-3'>
-                <h3>Tasks</h3>
+                <h3>Timesheets</h3>
             </div>
             <Grid data={data}>
                 <GridToolbar>
@@ -165,12 +165,9 @@ const Tasks = () => {
                     </Button>
                 </GridToolbar>
                 <Column field="id" title="ID" />
-                <Column field='name' title='Task Name' />
-                <Column field='project_name' title='Project Name' />
-                <Column field='client_name' title='Client Name' />
+                <Column field='name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>
-                <Column field='is_active' title='Active' />
                 <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
             </Grid>
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
@@ -178,7 +175,7 @@ const Tasks = () => {
             {openDialog && (
                 <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
                     <div>
-                        Are you sure you want to delete the task {selectedItem?.name} with ID {selectedItem?.id}?
+                        Are you sure you want to delete the timesheet {selectedItem?.name} with ID {selectedItem?.id}?
                     </div>
                     <DialogActionsBar>
                         <Button onClick={onDeleteData}>Delete</Button>
@@ -194,4 +191,4 @@ const Tasks = () => {
             </style>
         </React.Fragment>;
 };
-export default Tasks;
+export default Timesheets;
