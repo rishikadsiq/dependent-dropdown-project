@@ -6,6 +6,8 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import EditForm from './editForm';
 import AddClient from './AddClient';
+import Alerts from '../alerts/Alerts';
+import NavbarComponent from '../home/NavbarComponent';
 
 const EditCommandCell = props => {
   return <td>
@@ -27,7 +29,9 @@ const Clients = () => {
     const [data, setData] = React.useState([]);
     const [openDialog, setOpenDialog] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState(null);
-
+    const [showAlert, setShowAlert] = React.useState(false)
+    const [message, setMessage] = React.useState("")
+    const [variant, setVariant] = React.useState(null)
 
   const getListing = async() => {
     try {
@@ -100,6 +104,17 @@ const Clients = () => {
                 console.log(event);
                 
                 const data1 = await PostRequestHelper('addclient', event);
+                if(data1.status === 201){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                }
+                else if(data1.status === 409){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                }
+
                 console.log(data1);
                 setOpenAddForm(false);
             } catch (err) {
@@ -128,6 +143,16 @@ const Clients = () => {
                     changedData['id'] = event.id;
                 console.log(changedData) 
                 const data1 = await PostRequestHelper('updateclient', changedData);
+                if(data1.status === 200){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                }
+                else if(data1.status === 409){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                }
                 console.log(data1);
                 setOpenEditForm(false);
             } catch (err) {
@@ -148,10 +173,25 @@ const Clients = () => {
   const handleCancelEdit = () => {
     setOpenEditForm(false);
     setOpenAddForm(false);
-  };
+};
   return <React.Fragment>
-            <div className='mt-3 mb-3'>
-                <h3>Clients</h3>
+    <NavbarComponent />
+            {showAlert && (
+                <div style={{
+                    position: 'fixed',
+                    top: "45px",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10003,
+                    padding: '1rem',
+                }} className='container'>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
+            
+            {/* Main content with header and grid */}
+            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+                <h4>Clients</h4>
             </div>
             <Grid data={data}>
                 <GridToolbar>
