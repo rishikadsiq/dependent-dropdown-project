@@ -6,6 +6,8 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import EditForm from './editForm';
+import Alerts from '../alerts/Alerts';
+import NavbarComponent from '../home/NavbarComponent';
 
 
 const EditCommandCell = props => {
@@ -28,6 +30,10 @@ const Tasks = () => {
     const [data, setData] = React.useState([]);
     const [openDialog, setOpenDialog] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState(null);
+    const [showAlert, setShowAlert] = React.useState(false)
+    const [message, setMessage] = React.useState("")
+    const [variant, setVariant] = React.useState(null)
+    const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
 
 
   const getListing = async() => {
@@ -68,6 +74,16 @@ const Tasks = () => {
     // You can make a request to the backend to delete the item here
     try {
         const response = await PostRequestHelper('deletetask', { id: selectedItem.id });
+        if(response.status === 200){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+        }
+        else if(response.status === 409 || response.status === 400 || response.status === 404){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
+        }
         console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
@@ -104,9 +120,24 @@ const Tasks = () => {
                 console.log(event);
                 const updatedEvent = {...event, project_id: event.project_id.id}
                 console.log(updatedEvent)
-                
+                localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 const data1 = await PostRequestHelper('addtask', updatedEvent);
                 console.log(data1);
+                if(data1.status === 201){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                    localStorage.removeItem('to_be_add');
+                }
+                else if(data1.status === 409 ){
+                    setShowDuplicateDialog(true)
+                }
+                else if(data1.status === 400 ){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                    localStorage.removeItem('to_be_add');
+                }
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
@@ -135,6 +166,21 @@ const Tasks = () => {
                 console.log(changedData) 
                 const data1 = await PostRequestHelper('updatetask', changedData);
                 console.log(data1);
+                if(data1.status === 200){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                    localStorage.removeItem('to_be_add');
+                }
+                else if(data1.status === 409){
+                    setShowDuplicateDialog(true)
+                }
+                else if(data1.status===400 || data1.status === 404){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                    localStorage.removeItem('to_be_add');
+                }
                 setOpenEditForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -154,10 +200,76 @@ const Tasks = () => {
     setOpenEditForm(false);
     setOpenAddForm(false);
   };
+
+
+  const toggleDuplicateDialog = () => {
+    setShowDuplicateDialog(!showDuplicateDialog);
+  };
+
+  const handleAddDuplicate = () => {
+    const fetchData = async() => {
+        try{
+            const toBeAdded = localStorage.getItem('to_be_add');
+            if (toBeAdded) {
+                const parsedData = JSON.parse(toBeAdded)
+                const response = await PostRequestHelper('addduplicatetask', parsedData)
+                console.log(response)
+                if(response.status === 201) {
+                    setMessage(response.message)
+                        setShowAlert(true)
+                        setVariant("success")
+                        localStorage.removeItem('to_be_add');
+                }
+                getListing();
+            }
+        }catch(e){
+            console.error('Error adding duplicate data:', e);
+        }
+    }
+    fetchData();
+    toggleDuplicateDialog();
+    
+  }
   return <React.Fragment>
-     <      div className='mt-3 mb-3'>
-                <h3>Tasks</h3>
+            <NavbarComponent />
+            {showAlert && (
+                <div style={{
+                    position: 'fixed',
+                    top: "45px",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10003,
+                    padding: '1rem',
+                }} className='container'>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
+            
+            {/* Main content with header and grid */}
+            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+                <h4>Tasks</h4>
             </div>
+
+            {showDuplicateDialog && (
+                <Dialog title={"Please confirm"} onClose={toggleDuplicateDialog}>
+                <p
+                    style={{
+                    margin: "25px",
+                    textAlign: "center",
+                    }}
+                >
+                    This task name already exists and is associated with the same project. Do you want to add this duplicate name?
+                </p>
+                <DialogActionsBar>
+                    <Button type="button" onClick={toggleDuplicateDialog}>
+                    No
+                    </Button>
+                    <Button type="button" onClick={handleAddDuplicate}>
+                    Yes
+                    </Button>
+                </DialogActionsBar>
+                </Dialog>
+            )}
             <Grid data={data}>
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>

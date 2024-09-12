@@ -6,6 +6,8 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import EditForm from './editForm';
+import Alerts from '../alerts/Alerts';
+import NavbarComponent from '../home/NavbarComponent';
 
 
 const EditCommandCell = props => {
@@ -28,6 +30,9 @@ const Users = () => {
     const [data, setData] = React.useState([]);
     const [openDialog, setOpenDialog] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState(null);
+    const [showAlert, setShowAlert] = React.useState(false)
+    const [message, setMessage] = React.useState("")
+    const [variant, setVariant] = React.useState(null)
 
 
   const getListing = async() => {
@@ -68,6 +73,16 @@ const Users = () => {
     // You can make a request to the backend to delete the item here
     try {
         const response = await PostRequestHelper('deleteuser', { id: selectedItem.id });
+        if(response.status === 200){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+        }
+        else if(response.status === 409 || response.status === 400 || response.status === 404){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
+        }
         console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
@@ -106,12 +121,23 @@ const Users = () => {
                 console.log(updatedEvent)
                 
                 const data1 = await PostRequestHelper('adduser', updatedEvent);
+                if(data1.status === 201){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                }
+                else if(data1.status === 409 || data1.status === 400){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                }
                 console.log(data1);
+                getListing()
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
         }
-        fetchData(); // Call the function to fetch data
+        fetchData(); 
         setOpenAddForm(false)
     } else {
         const fetchData = async() => {
@@ -134,7 +160,18 @@ const Users = () => {
                     changedData['id'] = event.id;
                 console.log(changedData) 
                 const data1 = await PostRequestHelper('updateuser', changedData);
+                if(data1.status === 200){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("success")
+                }
+                else if(data1.status === 409 || data1.status===400 || data1.status === 404){
+                    setMessage(data1.message)
+                    setShowAlert(true)
+                    setVariant("danger")
+                }
                 console.log(data1);
+                getListing()
                 setOpenEditForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -142,7 +179,7 @@ const Users = () => {
         }
         fetchData();
     }
-    getListing()
+   
   };
   const addNew = () => {
     setOpenAddForm(true);
@@ -155,8 +192,23 @@ const Users = () => {
     setOpenAddForm(false);
   };
   return <React.Fragment>
-            <div className='mt-3 mb-3'>
-                <h3>Users</h3>
+            <NavbarComponent />
+            {showAlert && (
+                <div style={{
+                    position: 'fixed',
+                    top: "45px",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10003,
+                    padding: '1rem',
+                }} className='container'>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
+            
+            {/* Main content with header and grid */}
+            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+                <h4>Users</h4>
             </div>
             <Grid data={data}>
                 <GridToolbar>

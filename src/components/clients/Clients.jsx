@@ -58,15 +58,23 @@ const Clients = () => {
     setEditItem(item);
   };
 
-    const deleteItem = dataItem => {
-        return data.filter(item => item.id !== dataItem.id);
-    };
+ 
   const onDeleteData = async () => {
     setOpenDialog(false);
 
     // You can make a request to the backend to delete the item here
     try {
         const response = await PostRequestHelper('deleteclient', { id: selectedItem.id });
+        if(response.status === 200){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+        }
+        else if(response.status === 409 || response.status === 400 || response.status === 404){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
+        }
         console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
@@ -109,7 +117,7 @@ const Clients = () => {
                     setShowAlert(true)
                     setVariant("success")
                 }
-                else if(data1.status === 409){
+                else if(data1.status === 409 || data1.status === 400){
                     setMessage(data1.message)
                     setShowAlert(true)
                     setVariant("danger")
@@ -148,7 +156,7 @@ const Clients = () => {
                     setShowAlert(true)
                     setVariant("success")
                 }
-                else if(data1.status === 409){
+                else if(data1.status === 409 || data1.status===400 || data1.status === 404){
                     setMessage(data1.message)
                     setShowAlert(true)
                     setVariant("danger")
