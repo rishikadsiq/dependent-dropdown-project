@@ -7,11 +7,12 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
+import { useNavigate } from 'react-router-dom';
 
 
 const EditCommandCell = props => {
   return <td>
-            <Button themeColor={'primary'} type="button" >
+            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
                 Edit
             </Button>
             <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
@@ -31,6 +32,7 @@ const Timesheets = () => {
     const [editItem, setEditItem] = React.useState({
         id: 1
     });
+    const navigate = useNavigate();
 
 
   const getListing = async() => {
@@ -60,6 +62,9 @@ const Timesheets = () => {
     getListing(); // Call the function to fetch data
 }, []);
 
+    const enterEdit = item => {
+        navigate(`/timesheet/${item.id}`)
+    }
 
   
 
@@ -174,7 +179,8 @@ const Timesheets = () => {
                 <Column field='name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove}/>} />
+                <Column field='approval' title='Status' />
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit}/>} />
             </Grid>
             
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}

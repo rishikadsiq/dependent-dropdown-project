@@ -7,6 +7,7 @@ import Timesheets from './components/timesheets/Timesheets';
 import Signup from './components/authentication/Signup';
 import Login from './components/authentication/Login';
 import Home from './components/home/Home';
+import TaskHour from './components/taskhours/TaskHour';
 
 const AppRoutes = () => (
     <Router>
@@ -27,7 +28,7 @@ const AppRoutes = () => (
             <Route path='/tasks' element={<Tasks />} />
             <Route path='/timesheets' element={<Timesheets />} />
             <Route path='/users' element={<Users />} />
-
+            <Route path='/timesheet/:timesheetId' element={<TaskHour />} />
 
             {/* <Route path='/profile' element={<Profile />} /> */}
             {/* <Route path='/compress' element={<Compression />} /> */}

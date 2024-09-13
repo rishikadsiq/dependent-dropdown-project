@@ -2,6 +2,10 @@ import * as React from 'react';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
 import { DropDownCell, ProjectDropDownCell, TaskDropDownCell } from './myDropDownCell';
+import { PostRequestHelper } from '../helper/PostRequestHelper';
+import Alerts from '../alerts/Alerts';
+import NavbarComponent from '../home/NavbarComponent';
+import { useParams } from 'react-router-dom';
 
 const CustomCell = ({ tdProps, children, color }) => {
   return tdProps ? (
@@ -16,33 +20,49 @@ const MyNumericCustomCell = props => <CustomCell {...props} color="lightgreen" /
 const MyBooleanCustomCell = props => <CustomCell {...props} color="pink" />;
 const MyDateCustomCell = props => <CustomCell {...props} color="lightblue" />;
 
-const NewDemo = () => {
+const TaskHour = () => {
   const [data, setData] = React.useState([]);
+  const [timesheetData, setTimesheetData] = React.useState([]);
   const [client,setClient] = React.useState(null);
   const [project,setProject] = React.useState(null);
   const [task,setTask] = React.useState(null);
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [variant, setVariant] = React.useState(null)
+
+  const {timesheetId} = useParams()
+
+
+
+  const getListing = async() => {
+    try {
+        const data1 = await PostRequestHelper('taskhourslist', {timesheet_id: timesheetId});
+        console.log(data1);
+        if (data1.status === 404) {
+            setData([]);
+        } else {
+            console.log(data1)
+            const updatedData = data1.taskhours.map((item, index) => ({
+                ...item, // Spread the other properties
+                new_id: index+1,
+            }));
+            console.log(updatedData);
+            
+            setData(updatedData || []);
+            setTimesheetData([data1.timesheet_details])
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        setData([]); // Handle error case by setting an empty array or some default data
+    }
+};
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://127.0.0.1:5000/taskhourslist", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      const data = await response.json();
-      console.log(data)
-      const updatedData = data.map((item, index) => ({
-        ...item, // Spread the other properties
-        new_id: index+1,
-        start_date: new Date(item.start_date) // Convert start_date to Date object
-      }));
-      console.log(updatedData);
-      
-      setData(updatedData || []);
-    }
-    fetchData();
-  }, []);
+    getListing(); // Call the function to fetch data
+    console.log(timesheetData)
+}, []);
+
+  
 
   const enterInsert = () => {
     const dataItem = {
@@ -109,46 +129,13 @@ const NewDemo = () => {
         console.log(updatedDataItem)
         const addData = async () => {
           try {
-            const response = await fetch("http://127.0.0.1:5000/addtaskhours", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(updatedDataItem)  // Send dataItem in request body
-            });
-    
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Response from server:", data);
-                
-                const fetchData = async () => {
-                  const response = await fetch("http://127.0.0.1:5000/taskhourslist", {
-                    method: "GET",
-                    headers: {
-                      "Content-Type": "application/json"
-                    }
-                  });
-                  const data = await response.json();
-                  console.log(data)
-                  const updatedData = data.map((item, index) => ({
-                    ...item, // Spread the other properties
-                    new_id: index+1,
-                    start_date: new Date(item.start_date) // Convert start_date to Date object
-                  }));
-                  console.log(updatedData);
-                  
-                  setData(updatedData || []);
-                }
-                fetchData();
-              // Optionally, update the UI with the new id or other server responses
-            } else {
-              console.error("Failed to add data:", response.statusText);
-            }
+            const response = await PostRequestHelper("addtaskhours", updatedDataItem);
+            console.log(response)
           } catch (error) {
             console.error("Error while adding data:", error);
           }
         };
-        await addData();
+        getListing()
      } else {
       console.log('Editing item:', dataItem);
     }
@@ -249,6 +236,34 @@ const NewDemo = () => {
   );
   return (
     <div>
+        <NavbarComponent />
+            {showAlert && (
+                <div style={{
+                    position: 'fixed',
+                    top: "45px",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10003,
+                    padding: '1rem',
+                }} className='container'>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
+            
+            {/* Main content with header and grid */}
+            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+                <h4>Timesheet Data</h4>
+            </div>
+            <div className='mb-3'>
+            <Grid data={timesheetData}>
+                <Column field="timesheet_id" title="ID" />
+                <Column field='timesheet_name' title='Timesheet Name' />
+                <Column field='start_date' title='Start Date' format="{0:d}"/>
+                <Column field='end_date' title='End Date' format="{0:d}"/>
+                <Column field='approval' title='Status' />
+            </Grid>
+            </div>
+
       <Grid
         style={{ height: '400px' }}
         data={data}
@@ -286,5 +301,5 @@ const NewDemo = () => {
   );
 };
 
-export default NewDemo;
+export default TaskHour;
 
