@@ -37,7 +37,7 @@ const Timesheets = () => {
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('timesheetlist');
+        const data1 = await GetRequestHelper('timesheetlist', navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -72,7 +72,7 @@ const Timesheets = () => {
   const onDeleteData = async () => {
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deletetimesheet', { id: selectedItem.id });
+        const response = await PostRequestHelper('deletetimesheet', { id: selectedItem.id }, navigate);
         if(response.status === 200){
             setMessage(response.message)
             setShowAlert(true)
@@ -120,7 +120,7 @@ const Timesheets = () => {
                 const updatedEvent = {...event}
                 console.log(updatedEvent)
                 
-                const data1 = await PostRequestHelper('addtimesheet', updatedEvent);
+                const data1 = await PostRequestHelper('addtimesheet', updatedEvent, navigate);
                 console.log(data1);
                 if(data1.status === 201){
                     setMessage(data1.message)

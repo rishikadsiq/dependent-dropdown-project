@@ -8,6 +8,7 @@ import AddForm from './AddForm';
 import EditForm from './editForm';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
+import { useNavigate } from "react-router-dom";
 
 
 const EditCommandCell = props => {
@@ -33,11 +34,13 @@ const Users = () => {
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
+    const navigate = useNavigate()
+
 
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('userlist');
+        const data1 = await GetRequestHelper('userlist', navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -72,7 +75,7 @@ const Users = () => {
   const onDeleteData = async () => {
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deleteuser', { id: selectedItem.id });
+        const response = await PostRequestHelper('deleteuser', { id: selectedItem.id }, navigate);
         if(response.status === 200){
             setMessage(response.message)
             setShowAlert(true)
@@ -120,7 +123,7 @@ const Users = () => {
                 const updatedEvent = {...event, approver_id: event.approver_id.id, supervisor_id: event.supervisor_id.id}
                 console.log(updatedEvent)
                 
-                const data1 = await PostRequestHelper('adduser', updatedEvent);
+                const data1 = await PostRequestHelper('adduser', updatedEvent, navigate);
                 if(data1.status === 201){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -159,7 +162,7 @@ const Users = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updateuser', changedData);
+                const data1 = await PostRequestHelper('updateuser', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
                     setShowAlert(true)

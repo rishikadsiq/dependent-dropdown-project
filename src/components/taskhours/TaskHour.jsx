@@ -6,6 +6,7 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CustomCell = ({ tdProps, children, color }) => {
   return tdProps ? (
@@ -29,14 +30,14 @@ const TaskHour = () => {
   const [showAlert, setShowAlert] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
-
+  const navigate = useNavigate()
   const {timesheetId} = useParams()
 
 
 
   const getListing = async() => {
     try {
-        const data1 = await PostRequestHelper('taskhourslist', {timesheet_id: timesheetId});
+        const data1 = await PostRequestHelper('taskhourslist', {timesheet_id: timesheetId}, navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -129,7 +130,7 @@ const TaskHour = () => {
         console.log(updatedDataItem)
         const addData = async () => {
           try {
-            const response = await PostRequestHelper("addtaskhours", updatedDataItem);
+            const response = await PostRequestHelper("addtaskhours", updatedDataItem, navigate);
             console.log(response)
           } catch (error) {
             console.error("Error while adding data:", error);

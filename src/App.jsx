@@ -5,7 +5,7 @@ function App() {
   
 
   return (
-    <Container className='wittgenstein'>
+    <Container className='wittgenstein mb-5'>
       <AppRoutes />
       
     </Container>

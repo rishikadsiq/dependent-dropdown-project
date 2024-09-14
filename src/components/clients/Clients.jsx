@@ -8,6 +8,7 @@ import EditForm from './editForm';
 import AddClient from './AddClient';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
+import { useNavigate } from 'react-router-dom';
 
 const EditCommandCell = props => {
   return <td>
@@ -32,10 +33,11 @@ const Clients = () => {
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
+    const navigate = useNavigate()
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('clientlist');
+        const data1 = await GetRequestHelper('clientlist', navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -64,7 +66,7 @@ const Clients = () => {
 
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deleteclient', { id: selectedItem.id });
+        const response = await PostRequestHelper('deleteclient', { id: selectedItem.id }, navigate);
         if(response.status === 200){
             setMessage(response.message)
             setShowAlert(true)
@@ -111,7 +113,7 @@ const Clients = () => {
                 delete event.id
                 console.log(event);
                 
-                const data1 = await PostRequestHelper('addclient', event);
+                const data1 = await PostRequestHelper('addclient', event, navigate);
                 if(data1.status === 201){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -150,7 +152,7 @@ const Clients = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updateclient', changedData);
+                const data1 = await PostRequestHelper('updateclient', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
                     setShowAlert(true)

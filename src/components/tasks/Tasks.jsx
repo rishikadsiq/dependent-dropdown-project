@@ -8,6 +8,7 @@ import AddForm from './AddForm';
 import EditForm from './editForm';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
+import { useNavigate } from "react-router-dom";
 
 
 const EditCommandCell = props => {
@@ -34,11 +35,13 @@ const Tasks = () => {
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
     const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
+    const navigate = useNavigate()
+
 
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('tasklist');
+        const data1 = await GetRequestHelper('tasklist', navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -73,7 +76,7 @@ const Tasks = () => {
   const onDeleteData = async () => {
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deletetask', { id: selectedItem.id });
+        const response = await PostRequestHelper('deletetask', { id: selectedItem.id }, navigate);
         if(response.status === 200){
             setMessage(response.message)
             setShowAlert(true)
@@ -121,7 +124,7 @@ const Tasks = () => {
                 const updatedEvent = {...event, project_id: event.project_id.id}
                 console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
-                const data1 = await PostRequestHelper('addtask', updatedEvent);
+                const data1 = await PostRequestHelper('addtask', updatedEvent, navigate);
                 console.log(data1);
                 if(data1.status === 201){
                     setMessage(data1.message)
@@ -164,7 +167,7 @@ const Tasks = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updatetask', changedData);
+                const data1 = await PostRequestHelper('updatetask', changedData, navigate);
                 console.log(data1);
                 if(data1.status === 200){
                     setMessage(data1.message)
@@ -212,7 +215,7 @@ const Tasks = () => {
             const toBeAdded = localStorage.getItem('to_be_add');
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
-                const response = await PostRequestHelper('addduplicatetask', parsedData)
+                const response = await PostRequestHelper('addduplicatetask', parsedData, navigate)
                 console.log(response)
                 if(response.status === 201) {
                     setMessage(response.message)

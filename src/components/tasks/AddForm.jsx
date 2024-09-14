@@ -6,11 +6,13 @@ import { Button } from "@progress/kendo-react-buttons";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
-import { AutoComplete } from "@progress/kendo-react-dropdowns";
+import { useNavigate } from "react-router-dom";
 
 const EditForm = (props) => {
   const [projectData, setProjectData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate()
+
 
   // Validator function to ensure required fields are filled
   const requiredValidator = (value) => (value ? "" : "Error: This field is required.");
@@ -18,7 +20,7 @@ const EditForm = (props) => {
   // Fetch client and project metadata
   const getMetaData = async () => {
     try {
-      const response = await GetRequestHelper("projectlist");
+      const response = await GetRequestHelper("projectlist", navigate);
       if (response.status === 404) {
         setProjectData([]);
       } else {

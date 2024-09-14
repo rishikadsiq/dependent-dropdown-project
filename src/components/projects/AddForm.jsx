@@ -6,17 +6,19 @@ import { Button } from "@progress/kendo-react-buttons";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
+import { useNavigate } from "react-router-dom";
 
 const AddForm = (props) => {
   const [clientData, setClientData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate()
 
   const requiredValidator = (value) =>
     value ? "" : "Error: This field is required.";
 
   const getMetaData = async () => {
     try {
-      const response = await GetRequestHelper("clientlist");
+      const response = await GetRequestHelper("clientlist", navigate);
       if (response.status === 404) {
         setClientData([]);
       } else {

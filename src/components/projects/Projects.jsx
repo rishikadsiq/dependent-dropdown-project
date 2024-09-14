@@ -8,6 +8,7 @@ import AddForm from './AddForm';
 import EditForm from './editForm';
 import Alerts from '../alerts/Alerts';
 import NavbarComponent from '../home/NavbarComponent';
+import { useNavigate } from "react-router-dom";
 
 
 const EditCommandCell = props => {
@@ -34,12 +35,14 @@ const Projects = () => {
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
     const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
+    const navigate = useNavigate()
+
 
 
 
   const getListing = async() => {
     try {
-        const data1 = await GetRequestHelper('projectlist');
+        const data1 = await GetRequestHelper('projectlist', navigate);
         console.log(data1);
         if (data1.status === 404) {
             setData([]);
@@ -74,7 +77,7 @@ const Projects = () => {
   const onDeleteData = async () => {
     // You can make a request to the backend to delete the item here
     try {
-        const response = await PostRequestHelper('deleteproject', { id: selectedItem.id });
+        const response = await PostRequestHelper('deleteproject', { id: selectedItem.id }, navigate);
         if(response.status === 201){
             setMessage(response.message)
             setShowAlert(true)
@@ -123,7 +126,7 @@ const Projects = () => {
                 console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 
-                const data1 = await PostRequestHelper('addproject', updatedEvent);
+                const data1 = await PostRequestHelper('addproject', updatedEvent, navigate);
                 if(data1.status === 201){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -166,7 +169,7 @@ const Projects = () => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                 console.log(changedData) 
-                const data1 = await PostRequestHelper('updateproject', changedData);
+                const data1 = await PostRequestHelper('updateproject', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -213,7 +216,7 @@ const Projects = () => {
             const toBeAdded = localStorage.getItem('to_be_add');
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
-                const response = await PostRequestHelper('addduplicateproject', parsedData)
+                const response = await PostRequestHelper('addduplicateproject', parsedData, navigate)
                 console.log(response)
                 if(response.status === 200) {
                     setMessage(response.message)

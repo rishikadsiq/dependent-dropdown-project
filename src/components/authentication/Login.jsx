@@ -48,8 +48,8 @@ const Login = () => {
         console.log(response_data)
         const { access_token, refresh_token } = response_data;
         const decoded = jwtDecode(access_token)
-        localStorage.setItem('accessToken', access_token);
-        localStorage.setItem('refreshToken', refresh_token);
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('userData', JSON.stringify(decoded));
         console.log("Navigating to home page...");
         navigate('/')

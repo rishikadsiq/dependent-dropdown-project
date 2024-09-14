@@ -6,6 +6,7 @@ import { Button } from "@progress/kendo-react-buttons";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { RadioGroup } from "@progress/kendo-react-inputs";
+import { useNavigate } from "react-router-dom";
 
 const genderData = [
   { label: 'Female', value: 'female' },
@@ -16,6 +17,8 @@ const genderData = [
 const EditForm = (props) => {
   const [userData, setUserData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate()
+
 
   // Validator function to ensure required fields are filled
   const requiredValidator = (value) => (value ? "" : "Error: This field is required.");
@@ -23,7 +26,7 @@ const EditForm = (props) => {
   // Fetch client and user metadata
   const getMetaData = async () => {
     try {
-      const response = await GetRequestHelper("userlist");
+      const response = await GetRequestHelper("userlist", navigate);
       if (response.status === 404) {
         setUserData([]);
       } else {
