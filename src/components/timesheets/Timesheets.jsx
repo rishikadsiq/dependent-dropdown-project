@@ -15,6 +15,7 @@ const EditCommandCell = props => {
             <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
                 Edit
             </Button>
+
             <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
                 Delete
             </Button>

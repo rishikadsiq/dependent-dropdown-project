@@ -13,10 +13,10 @@ import {
 } from './validators'
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (formData) => {
-    console.log("Login form submitted", formData)
+    console.log("Login form submitted", formData);
     const response = await fetch("http://127.0.0.1:5000/login", {
       method: 'POST',
       body: JSON.stringify({
@@ -44,26 +44,23 @@ const Login = () => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const response_data = await response.json()
-        console.log(response_data)
+        const response_data = await response.json();
+        console.log(response_data);
         const { access_token, refresh_token } = response_data;
-        const decoded = jwtDecode(access_token)
+        const decoded = jwtDecode(access_token);
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('userData', JSON.stringify(decoded));
         console.log("Navigating to home page...");
-        navigate('/')
-
-
+        navigate('/');
       } catch (error) {
         console.error('Error:', error);
         throw error;
-
       }
     } else {
       console.error("Failed to submit form data:", response.message);
     }
-  }
+  };
 
   return (
     <Container>
@@ -82,8 +79,6 @@ const Login = () => {
                     component={FormInput}
                     validator={emailValidator}
                   />
-
-
                   <Field
                     id={'password'}
                     name={'password'}
@@ -91,8 +86,7 @@ const Login = () => {
                     component={FormInput}
                     validator={requiredValidator}
                   />
-
-                  <div className="k-form-buttons">
+                  <div className="d-flex justify-content-between align-items-center mt-3">
                     <Button
                       themeColor={"primary"}
                       type={"submit"}
@@ -100,6 +94,13 @@ const Login = () => {
                     >
                       Login
                     </Button>
+                    <span
+                      className="text-decoration-underline text-info"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate('/forgotpassword')}
+                    >
+                      Forgot Password
+                    </span>
                   </div>
                   <Card.Text className="mt-3" style={{ fontWeight: 'normal' }}>
                     Don&apos;t have an account? <span className="text-decoration-underline text-info" onClick={() => navigate('/register')} style={{ cursor: "pointer" }}>Signup</span>

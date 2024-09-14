@@ -1,10 +1,10 @@
 import React from 'react'
-import NavbarComponent from './NavbarComponent'
+import HeaderLayout from './HeaderLayout'
 
 const Home = () => {
   return (
     <div>
-    <NavbarComponent />
+    <HeaderLayout />
       Navbar
     </div>
   )

@@ -3,9 +3,19 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { useNavigate } from 'react-router-dom';
+
 
 function NavbarComponent() {
+  const navigate = useNavigate()
+  const access_token = localStorage.getItem('access_token')
+  const refresh_token = localStorage.getItem('refresh_token')
   const userData = JSON.parse(localStorage.getItem('userData'));
+
+  
+  React.useEffect(() => {
+    if(!access_token && !refresh_token && !userData)  return navigate('/login')
+},[])
   console.log(userData);
 
   // Set circle color based on role
@@ -28,6 +38,14 @@ function NavbarComponent() {
   const handleMouseLeave = () => setShowDropdown(false);
   const handleMouseEnter1 = () => setShowDropdown1(true);
   const handleMouseLeave1 = () => setShowDropdown1(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('userData');
+    console.log('Logged out successfully')
+    navigate('/login');
+  }
 
   return (
     <Navbar expand="lg" style={{ backgroundColor: "#EAE4DD" }}>
@@ -75,7 +93,7 @@ function NavbarComponent() {
                 <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
                 <NavDropdown.Item href="/settings">Settings</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
+                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </div>
           </Nav>

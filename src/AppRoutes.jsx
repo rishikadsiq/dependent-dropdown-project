@@ -7,7 +7,8 @@ import Timesheets from './components/timesheets/Timesheets';
 import Signup from './components/authentication/Signup';
 import Login from './components/authentication/Login';
 import Home from './components/home/Home';
-import TaskHour from './components/taskhours/TaskHour';
+import TaskHour from './components/taskhours/TaskHour'
+import ForgotPassword from './components/authentication/ForgotPassword';
 
 const AppRoutes = () => (
     <Router>
@@ -15,8 +16,8 @@ const AppRoutes = () => (
             {/* Auth Urls */}
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Signup />} />
-            {/* <Route path='/forgot-password' element={<ForgotPassword />} />
-            <Route path='/reset-password' element={<ResetPassword />} /> */}
+            <Route path='/forgotpassword' element={<ForgotPassword />} />
+            {/* <Route path='/reset-password' element={<ResetPassword />} /> */}
 
             {/* Home Urls */}
             
