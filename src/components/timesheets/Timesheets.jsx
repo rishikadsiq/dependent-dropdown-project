@@ -6,21 +6,49 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import Alerts from '../alerts/Alerts';
-import NavbarComponent from '../home/NavbarComponent';
+import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
 
 
-const EditCommandCell = props => {
-  return <td>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-                Edit
-            </Button>
 
-            <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
-                Delete
-            </Button>
-        </td>;
+const EditCommandCell = props => {
+  const { approval } = props.dataItem;
+
+  return (
+    <td>
+      {['DRAFT', 'REJECTED'].includes(approval) && (
+        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+          Edit
+        </Button>
+      )}
+
+      {approval === 'DRAFT' && (
+        <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
+          Delete
+        </Button>
+      )}
+
+      {approval === 'APPROVED' && (
+        <>
+          <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+            Show
+          </Button>
+          <Button themeColor={'primary'} type="button" onClick={() => props.recall(props.dataItem)}>
+            Recall
+          </Button>
+        </>
+      )}
+
+      {approval === 'PENDING' && (
+        <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+          Show
+        </Button>
+      )}
+    </td>
+  );
 };
+
+
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Timesheets = () => {
     const [openAddForm, setOpenAddForm] = React.useState(false);
@@ -67,6 +95,9 @@ const Timesheets = () => {
         navigate(`/timesheet/${item.id}`)
     }
 
+    const showTimesheet = item => {
+        navigate(`/timesheet/${item.id}`)
+    }
   
 
     
@@ -152,7 +183,7 @@ const Timesheets = () => {
     setOpenAddForm(false);
   };
   return <React.Fragment>
-            <NavbarComponent />
+            <HeaderLayout>
             {showAlert && (
                 <div style={{
                     position: 'fixed',
@@ -181,12 +212,12 @@ const Timesheets = () => {
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>
                 <Column field='approval' title='Status' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit}/>} />
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit} showTimesheet={showTimesheet}/>} />
             </Grid>
             
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (
-                <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
+                <Dialog title={"Delete Timesheet"} onClose={toggleDialog} width={350}>
                     <div>
                         Are you sure you want to delete the timesheet {selectedItem?.name} with ID {selectedItem?.id}?
                     </div>
@@ -202,6 +233,7 @@ const Timesheets = () => {
                     z-index: 10003;
                 }`}
             </style>
+            </HeaderLayout>
         </React.Fragment>;
 };
 export default Timesheets;

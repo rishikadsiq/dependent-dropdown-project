@@ -2,11 +2,14 @@ import * as React from 'react';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { useNavigate } from 'react-router-dom';
-import { GetRequestHelper } from '../helper/GetRequestHelper';
 
 const fetchMetaData = async () => {
-  const response = await GetRequestHelper('metadata', navigate)
+  const response = await fetch("http://127.0.0.1:5000/metadata", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
   const metadata = await response.json();
   console.log(metadata);
   return metadata

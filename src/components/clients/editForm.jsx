@@ -38,17 +38,15 @@ const EditForm = props => {
     </div>
   );
 
-  return <Dialog title={`edit Client`} onClose={props.cancelEdit}>
+  return <Dialog title={`Edit Client`} onClose={props.cancelEdit}>
         <Form onSubmit={props.onSubmit} initialValues={props.item} render={formRenderProps => <FormElement style={{
       maxWidth: 650
     }}>
               <fieldset className={"k-form-fieldset"}>
                 <div className="mb-3">
-                  <Field name={"firstname"} component={Input} label={"First Name *"} validator={requiredValidator}/>
+                  <Field name={"name"} component={Input} label={"Client Name *"} validator={requiredValidator}/>
                 </div>
-                <div className="mb-3">
-                  <Field name={"lastname"} component={Input} label={"Last Name"} />
-                </div>
+                
                 <div className="mb-3">
                   <Field
                     name={"email"}

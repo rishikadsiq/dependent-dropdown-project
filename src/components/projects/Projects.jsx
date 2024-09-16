@@ -7,7 +7,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import EditForm from './editForm';
 import Alerts from '../alerts/Alerts';
-import NavbarComponent from '../home/NavbarComponent';
+import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 
 
@@ -235,7 +235,7 @@ const Projects = () => {
     
   }
   return <React.Fragment>
-            <NavbarComponent />
+            <HeaderLayout>
             {showAlert && (
                 <div style={{
                     position: 'fixed',
@@ -291,7 +291,7 @@ const Projects = () => {
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (
-                <Dialog title={"Delete Client"} onClose={toggleDialog} width={350}>
+                <Dialog title={"Delete Project"} onClose={toggleDialog} width={350}>
                     <div>
                         Are you sure you want to delete the project {selectedItem?.name} with ID {selectedItem?.id}?
                     </div>
@@ -307,6 +307,7 @@ const Projects = () => {
                     z-index: 10003;
                 }`}
             </style>
+            </HeaderLayout>
         </React.Fragment>;
 };
 export default Projects;

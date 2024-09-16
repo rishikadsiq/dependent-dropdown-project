@@ -9,6 +9,7 @@ import Login from './components/authentication/Login';
 import Home from './components/home/Home';
 import TaskHour from './components/taskhours/TaskHour'
 import ForgotPassword from './components/authentication/ForgotPassword';
+import Approvals from './components/approvals/Approvals';
 
 const AppRoutes = () => (
     <Router>
@@ -30,6 +31,7 @@ const AppRoutes = () => (
             <Route path='/timesheets' element={<Timesheets />} />
             <Route path='/users' element={<Users />} />
             <Route path='/timesheet/:timesheetId' element={<TaskHour />} />
+            <Route path='/approvals' element={<Approvals />} />
 
             {/* <Route path='/profile' element={<Profile />} /> */}
             {/* <Route path='/compress' element={<Compression />} /> */}

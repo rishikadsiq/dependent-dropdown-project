@@ -29,11 +29,9 @@ const AddClient = props => {
     }}>
               <fieldset className={"k-form-fieldset"}>
                 <div className="mb-3">
-                  <Field name={"firstname"} component={Input} label={"First Name *"} validator={requiredValidator}/>
+                  <Field name={"name"} component={Input} label={"Client Name *"} validator={requiredValidator}/>
                 </div>
-                <div className="mb-3">
-                  <Field name={"lastname"} component={Input} label={"Last Name"} />
-                </div>
+                
                 <div className="mb-3">
                   <Field
                     name={"email"}

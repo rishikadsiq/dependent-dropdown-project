@@ -7,8 +7,7 @@ const HeaderLayout = (props) => {
     <div style={{ backgroundColor: '#eaf4f4', minHeight:'100vh',height:"auto" }} >
       {/* Your code here */}
       <NavbarComponent />
-      <div className="container d-flex" >
-        {/* <Sidebar /> */}
+      <div className="d-flex" >
         <Container className="flex-grow-1 p-3" >
           {props.children}
         </Container>

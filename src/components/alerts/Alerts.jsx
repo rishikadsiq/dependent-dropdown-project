@@ -14,7 +14,7 @@ const Alerts = ({ showAlert, setShowAlert, message, variant }) => {
 
   return (
     showAlert && (
-      <div style={{ maxHeight: "10px" }}>
+      <div style={{ textAlign: 'center', maxHeight: '10px' }}>
         <Alert variant={variant} onClose={() => setShowAlert(false)} dismissible>
           {message}
         </Alert>

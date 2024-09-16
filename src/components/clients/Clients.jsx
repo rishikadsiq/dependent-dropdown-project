@@ -7,7 +7,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import EditForm from './editForm';
 import AddClient from './AddClient';
 import Alerts from '../alerts/Alerts';
-import NavbarComponent from '../home/NavbarComponent';
+import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
 
 const EditCommandCell = props => {
@@ -185,7 +185,7 @@ const Clients = () => {
     setOpenAddForm(false);
 };
   return <React.Fragment>
-    <NavbarComponent />
+    <HeaderLayout>
             {showAlert && (
                 <div style={{
                     position: 'fixed',
@@ -235,6 +235,7 @@ const Clients = () => {
                     z-index: 10003;
                 }`}
             </style>
+            </HeaderLayout>
         </React.Fragment>;
 };
 export default Clients;

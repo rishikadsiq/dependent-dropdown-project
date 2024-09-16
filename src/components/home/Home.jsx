@@ -4,8 +4,10 @@ import HeaderLayout from './HeaderLayout'
 const Home = () => {
   return (
     <div>
-    <HeaderLayout />
-      Navbar
+    <HeaderLayout>
+    Navbar
+    </HeaderLayout>
+      
     </div>
   )
 }
