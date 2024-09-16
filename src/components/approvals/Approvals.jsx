@@ -11,34 +11,36 @@ import { useNavigate } from 'react-router-dom';
 
 
 const EditCommandCell = props => {
-    const { approval } = props.dataItem;
+    const { status } = props.dataItem;
   
     return (
       <td>
-        {['DRAFT', 'REJECTED'].includes(approval) && (
+        {status === 'REJECTED' && (
           <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-            Edit
+            Show
           </Button>
         )}
   
-        {approval === 'DRAFT' && (
-          <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
-            Delete
-          </Button>
-        )}
   
-        {approval === 'APPROVED' && (
+        {status === 'APPROVED' && (
+          <>
+            <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+              Show
+            </Button>
+          </>
+        )}
+        {status === 'RECALL' && (
           <>
             <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
               Show
             </Button>
             <Button themeColor={'primary'} type="button" onClick={() => props.recall(props.dataItem)}>
-              Recall
+              Approve Recall
             </Button>
           </>
         )}
   
-        {approval === 'PENDING' && (
+        {status === 'PENDING' && (
           <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
             Show
           </Button>
@@ -193,14 +195,10 @@ const Approvals = () => {
             
             {/* Main content with header and grid */}
             <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
-                <h4>Timesheets</h4>
+                <h4>Approvals</h4>
             </div>
             <Grid data={data}>
-                <GridToolbar>
-                    <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
-                        Add new
-                    </Button>
-                </GridToolbar>
+                
                 <Column field="id" title="ID" />
                 <Column field='name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>

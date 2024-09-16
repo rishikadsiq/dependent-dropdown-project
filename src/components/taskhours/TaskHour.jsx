@@ -385,13 +385,13 @@ const TaskHour = () => {
           }
         }}
       >
-        {showActions && (timesheetData.approval === 'DRAFT' || timesheetData.approval === 'REJECTED') && (
+        
           <GridToolbar>
             <Button title="Add new" type="button" onClick={enterInsert}>
               Add new
             </Button>
           </GridToolbar>
-        )}
+      
         <Column field="id" title="Id" editable={false} width={"50px"}/>
         <Column field="client_name" title="Client Name" cell={props=>
           <DropDownCell 
@@ -439,9 +439,7 @@ const TaskHour = () => {
         <Column field="fri" title="Fri" editor="numeric" />
         <Column field="sat" title="Sat" editor="numeric" />
         <Column field="sun" title="Sun" editor="numeric" />
-        {showActions && (timesheetData.approval === 'DRAFT' || timesheetData.approval === 'REJECTED') && (
-            <Column cell={MyCommandCell} title="Actions" width="150px" />
-        )}
+        <Column cell={MyCommandCell} title="Actions" />
         
           
       </Grid>
