@@ -9,6 +9,8 @@ import HeaderLayout from '../home/HeaderLayout'
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import Alerts from '../alerts/Alerts';
+import { TextArea } from '@progress/kendo-react-inputs';
+import { Form, Field, FormElement } from '@progress/kendo-react-form';
 
 
 
@@ -161,7 +163,6 @@ const TaskHour = () => {
   const [showAlert, setShowAlert] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
-  const [showActions, setShowActions] = React.useState(false)
 
   const { timesheetId } = useParams();
   const navigate = useNavigate();
@@ -200,7 +201,7 @@ const TaskHour = () => {
 
   const getListing = async () => {
     try {
-      const data1 = await PostRequestHelper('taskhourslist', { timesheet_id: timesheetId });
+      const data1 = await PostRequestHelper('taskhourslist', { timesheet_id: timesheetId }, navigate);
       const updatedData = data1.taskhours.map((item, index) => ({
         ...item,
         new_id: index + 1,
@@ -215,7 +216,7 @@ const TaskHour = () => {
 
   React.useEffect(() => {
     getListing();
-    setShowActions(true);
+    
   }, []);
 
   const enterInsert = () => {
@@ -238,6 +239,9 @@ const TaskHour = () => {
 
   const enterEdit = dataItem => {
     setData(data.map(item => (item.id === dataItem.id ? { ...item, inEdit: true } : item)));
+    setClient(dataItem.client_id)
+    setProject(dataItem.project_id)
+    setTask(dataItem.task_id)
   };
 
   const save = async dataItem => {
@@ -268,10 +272,45 @@ const TaskHour = () => {
         }
     }
     fetchData(); 
-    } 
+    }
+    else{
+      const updatedDataItem = [{
+        values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
+        task_id: task,
+        timesheet_id: timesheetId,
+        id: dataItem.id
+      }];
+      delete updatedDataItem.inEdit;
+      console.log(updatedDataItem)
+      
+      const fetchData = async() => {
+        try {
+          console.log(updatedDataItem)
+            const data1 = await PostRequestHelper('updatetaskhours', updatedDataItem[0], navigate);
+            console.log(data1);
+            if(data1.status === 200){
+                setMessage(data1.message)
+                setShowAlert(true)
+                setVariant("success")
+                setSelectedItem(null)
+            }else if(data1.status === 400 || data1.status ===409){
+                setMessage(data1.message)
+                setShowAlert(true)
+                setVariant("danger")
+                setSelectedItem(null)
+            }
+        } catch (e) {
+          console.error('Error fetching data:', e);
+          setSelectedItem(null)
+        }
+      }
+      fetchData();
+    }
 
-    setData(data.map(item => (item.id === dataItem.id ? { ...dataItem, inEdit: undefined } : item)));
     getListing();
+    setClient(null);
+    setProject(null)
+    setTask(null);
   };
 
   const cancel = dataItem => {
@@ -343,6 +382,29 @@ const TaskHour = () => {
       )}
     </td>
   );
+
+  const handleApprovalSubmit = async(dataItem) => {
+    try {
+        const response = await PostRequestHelper('approvalrequest', { timesheet_id: timesheetId }, navigate);
+        if(response.status === 201){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+            navigate('/timesheets')
+        }
+        else if(response.status === 409 || response.status === 400 || response.status === 404){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
+        }
+        console.log(response);
+    } catch (err) {
+        console.error('Error approving timesheet:', err);
+    }
+    finally{
+      getListing();
+    }
+  }
   console.log('data',task,client,project);
   return (
     <div>
@@ -385,12 +447,14 @@ const TaskHour = () => {
           }
         }}
       >
-        
+        {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
           <GridToolbar>
             <Button title="Add new" type="button" onClick={enterInsert}>
               Add new
             </Button>
           </GridToolbar>
+        )}
+          
       
         <Column field="id" title="Id" editable={false} width={"50px"}/>
         <Column field="client_name" title="Client Name" cell={props=>
@@ -439,7 +503,9 @@ const TaskHour = () => {
         <Column field="fri" title="Fri" editor="numeric" />
         <Column field="sat" title="Sat" editor="numeric" />
         <Column field="sun" title="Sun" editor="numeric" />
-        <Column cell={MyCommandCell} title="Actions" />
+        {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
+          <Column cell={MyCommandCell} title="Actions" />
+        )}
         
           
       </Grid>
@@ -454,6 +520,33 @@ const TaskHour = () => {
                     </DialogActionsBar>
                 </Dialog>
             )}
+      {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
+          <div className='mt-3'>
+            <div className='mb-3'>
+            <Form onSubmit={handleApprovalSubmit} render={formRenderProps =>
+              <FormElement>
+                <fieldset className={'k-form-fieldset'}>
+                  <label>Description</label>
+                  <Field
+                    id={'description'}
+                    name={'description'}
+                    label={'Description'}
+                    component={TextArea}
+                  />
+                   <div className="d-flex justify-content-between align-items-center mt-3">
+                    <Button
+                      themeColor={"primary"}
+                      type={"submit"}
+                      disabled={!formRenderProps.allowSubmit}
+                    >
+                      Send for Approval
+                    </Button>
+                  </div>
+                </fieldset>
+              </FormElement>} />
+          </div>
+          </div>
+        )}
 
             <style>
                 {`.k-animation-container {

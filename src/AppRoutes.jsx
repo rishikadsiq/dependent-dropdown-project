@@ -10,6 +10,8 @@ import Home from './components/home/Home';
 import TaskHour from './components/taskhours/TaskHour'
 import ForgotPassword from './components/authentication/ForgotPassword';
 import Approvals from './components/approvals/Approvals';
+import ApprovalTimesheet from './components/approvals/ApprovalTimesheet';
+import ResetPassword from './components/authentication/ResetPassword';
 
 const AppRoutes = () => (
     <Router>
@@ -18,7 +20,7 @@ const AppRoutes = () => (
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Signup />} />
             <Route path='/forgotpassword' element={<ForgotPassword />} />
-            {/* <Route path='/reset-password' element={<ResetPassword />} /> */}
+            <Route path='/reset-password/:code' element={<ResetPassword />} />
 
             {/* Home Urls */}
             
@@ -32,6 +34,7 @@ const AppRoutes = () => (
             <Route path='/users' element={<Users />} />
             <Route path='/timesheet/:timesheetId' element={<TaskHour />} />
             <Route path='/approvals' element={<Approvals />} />
+            <Route path='/approval/:timesheetId' element={<ApprovalTimesheet />} />
 
             {/* <Route path='/profile' element={<Profile />} /> */}
             {/* <Route path='/compress' element={<Compression />} /> */}

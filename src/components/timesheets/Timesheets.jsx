@@ -30,7 +30,7 @@ const EditCommandCell = props => {
 
       {approval === 'APPROVED' && (
         <>
-          <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+          <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
             Show
           </Button>
           <Button themeColor={'primary'} type="button" onClick={() => props.recall(props.dataItem)}>
@@ -40,7 +40,12 @@ const EditCommandCell = props => {
       )}
 
       {approval === 'PENDING' && (
-        <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+          Show
+        </Button>
+      )}
+      {approval === 'RECALLED' && (
+        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
           Show
         </Button>
       )}
@@ -95,10 +100,28 @@ const Timesheets = () => {
         navigate(`/timesheet/${item.id}`)
     }
 
-    const showTimesheet = item => {
-        navigate(`/timesheet/${item.id}`)
+    const recall =async(item) => {
+      // You can make a request to the backend to recall the item here
+      try {
+        const response = await PostRequestHelper('recallrequest', { timesheet_id: item.id }, navigate);
+        if(response.status === 201){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+        }
+        else if(response.status === 409 || response.status === 400 || response.status === 404){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
+        }
+        console.log(response);
+      } catch (err) {
+        console.error('Error recalling data:', err);
+      }
+      finally{
+        getListing()
+      }
     }
-  
 
     
   const onDeleteData = async () => {
@@ -143,16 +166,24 @@ const Timesheets = () => {
         }
         return item;
       });
+      const formatDate = (date) => {
+        const d = new Date(date);
+        const month = ('0' + (d.getMonth() + 1)).slice(-2);
+        const day = ('0' + d.getDate()).slice(-2);
+        const year = d.getFullYear();
+        return `${year}-${month}-${day}`;
+    };
     if (newItem) {
         console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
                 console.log(event);
-                const updatedEvent = {...event}
-                console.log(updatedEvent)
-                
-                const data1 = await PostRequestHelper('addtimesheet', updatedEvent, navigate);
+                const formattedDate = formatDate(event.date);
+                console.log(formattedDate); // Now it should show the correct date
+
+                const data1 = await PostRequestHelper('addtimesheet', { date: formattedDate }, navigate);
+                console.log(data1);
                 console.log(data1);
                 if(data1.status === 201){
                     setMessage(data1.message)
@@ -212,7 +243,7 @@ const Timesheets = () => {
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>
                 <Column field='approval' title='Status' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit} showTimesheet={showTimesheet}/>} />
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit} recall={recall}/>} />
             </Grid>
             
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}

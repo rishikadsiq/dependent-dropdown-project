@@ -1,3 +1,4 @@
+import React from 'react';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
@@ -10,15 +11,28 @@ import {
   emailValidator,
 } from './validators'
 
-import { PostRequestHelper } from '../helper/PostRequestHelper';
+import Alerts from '../alerts/Alerts';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [variant, setVariant] = React.useState(null)
 
   const handleSubmit = async (formData) => {
-    console.log("Login form submitted", formData);
-    const response = await PostRequestHelper('forgotpassword', {email: formData.email}, navigate)
-    if (response.status == 200) {
+    console.log("Forgot password email sent", formData);
+    const response = await fetch('http://localhost:5000/forgotpassword', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: formData.email }) // Send email in request body
+    });
+
+    if (response.status === 200) {
+      setMessage('Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder.');
+      setShowAlert(true);
+      setVariant("success");
       console.log("Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder.");
     }
   };
@@ -28,37 +42,51 @@ const ForgotPassword = () => {
       <div className="d-flex align-items-center justify-content-center vh-100 h4 flex-column">
         <h1>Get started with TimeChronos</h1>
         <h3>Forgot Password</h3>
-        <Card className="border shadow-sm mt-3" style={{ width: '30%' }}>
-          <div className='p-4'>
-          <Card.Text className="mt-3" style={{ fontWeight: 'normal' }}>
+
+        {/* Show the alert if the email is sent successfully */}
+
+        {/* Conditionally render the card if the alert is not shown */}
+        
+          <Card className="border shadow-sm mt-3" style={{ width: '30%' }}>
+            <div className='p-4'>
+              {!showAlert && (
+                <>
+                <Card.Text className="mt-3" style={{ fontWeight: 'normal' }}>
                 Enter your email and we'll send you a link to get back into your account.
-            </Card.Text>
-            <Form onSubmit={handleSubmit} render={formRenderProps =>
-              <FormElement>
-                <fieldset className={'k-form-fieldset'}>
-                  <Field
-                    id={'email'}
-                    name={'email'}
-                    label={'Email *'}
-                    component={FormInput}
-                    validator={emailValidator}
-                  />
-                  
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <Button
-                      themeColor={"primary"}
-                      type={"submit"}
-                      disabled={!formRenderProps.allowSubmit}
-                    >
-                      Send Email
-                    </Button>
-                    
-                  </div>
-                 
-                </fieldset>
-              </FormElement>} />
-          </div>
-        </Card>
+              </Card.Text>
+              <Form onSubmit={handleSubmit} render={formRenderProps =>
+                <FormElement>
+                  <fieldset className={'k-form-fieldset'}>
+                    <Field
+                      id={'email'}
+                      name={'email'}
+                      label={'Email *'}
+                      component={FormInput}
+                      validator={emailValidator}
+                    />
+
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <Button
+                        themeColor={"primary"}
+                        type={"submit"}
+                        disabled={!formRenderProps.allowSubmit}
+                      >
+                        Send Email
+                      </Button>
+                    </div>
+                  </fieldset>
+                </FormElement>} />
+                </>
+                )}
+                {showAlert && (
+                  <Card.Text className="mt-3">
+                    {message}
+                  </Card.Text>
+
+                )}
+            </div>
+          </Card>
+
       </div>
     </Container>
   );

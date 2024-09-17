@@ -4,7 +4,6 @@ import { Button } from "@progress/kendo-react-buttons";
 import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import AddForm from './AddForm';
 import Alerts from '../alerts/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
@@ -24,44 +23,44 @@ const EditCommandCell = props => {
   
         {status === 'APPROVED' && (
           <>
-            <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
               Show
             </Button>
           </>
         )}
-        {status === 'RECALL' && (
+        {status === 'RECALLED' && (
           <>
-            <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
+            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
               Show
             </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.recall(props.dataItem)}>
-              Approve Recall
+            <Button themeColor={'primary'} type="button" onClick={() => props.AcceptRecall(props.dataItem)}>
+              Accept Recall
             </Button>
           </>
         )}
   
         {status === 'PENDING' && (
-          <Button themeColor={'primary'} type="button" onClick={() => props.showTimesheet(props.dataItem)}>
-            Show
-          </Button>
+          <>
+            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+              Show
+            </Button>
+            <Button themeColor={'primary'} type="button" onClick={() => props.ApproveTimesheet(props.dataItem)}>
+              Approve
+            </Button>
+          </>
         )}
       </td>
     );
   };
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Approvals = () => {
-    const [openAddForm, setOpenAddForm] = React.useState(false);
     const [data, setData] = React.useState([]);
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const [selectedItem, setSelectedItem] = React.useState(null);
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
-    const [editItem, setEditItem] = React.useState({
-        id: 1
-    });
+    
     const navigate = useNavigate();
-
+    
 
   const getListing = async() => {
     try {
@@ -90,94 +89,44 @@ const Approvals = () => {
     getListing(); // Call the function to fetch data
 }, []);
 
-    const enterEdit = item => {
-        navigate(`/timesheet/${item.id}`)
-    }
+  const enterEdit = item => {
+    navigate(`/approval/${item.id}`)
+  }
 
-  
-
-    
-  const onDeleteData = async () => {
-    // You can make a request to the backend to delete the item here
+  const ApproveTimesheet = async(item) => {
     try {
-        const response = await PostRequestHelper('deletetimesheet', { id: selectedItem.id }, navigate);
-        if(response.status === 200){
-            setMessage(response.message)
-            setShowAlert(true)
-            setVariant("success")
+      const response = await PostRequestHelper('approvetimesheet', {timesheet_id: item.id}, navigate);
+        if(response.status === 201) {
+          setShowAlert(true)
+          setMessage(response.message)
+          setVariant('success')
+          getListing()
         }
-        else if(response.status === 409 || response.status === 400 || response.status === 404){
-            setMessage(response.message)
-            setShowAlert(true)
-            setVariant("danger")
-        }
-        console.log(response);
-    } catch (err) {
-        console.error('Error deleting data:', err);
+    } catch (error) {
+        console.error('Error approving timesheet:', error);
+        setShowAlert(true)
+        setMessage("Error Approving Timesheet")
+        setVariant('error')
     }
-    setOpenDialog(false)
-    getListing()
-    };
+  }
 
-    const toggleDialog = () => {
-        setOpenDialog(false);
-    };
-
-    const remove = (dataItem) => {
-        setSelectedItem(dataItem);
-        setOpenDialog(true);
-    };
-
-  const handleSubmit = event => {
-    let newItem = true;
-    let newData = data.map(item => {
-        if (event.id === item.id) {
-          newItem = false;
-          item = {
-            ...event
-          };
+  const AcceptRecall = async(item) => {
+    try {
+      const response = await PostRequestHelper('acceptrecallrequest', {timesheet_id: item.id}, navigate);
+        if(response.status === 201) {
+          setShowAlert(true)
+          setMessage(response.message)
+          setVariant('success')
+          getListing()
         }
-        return item;
-      });
-    if (newItem) {
-        console.log(event)
-        const fetchData = async() => {
-            try {
-                delete event.id
-                console.log(event);
-                const updatedEvent = {...event}
-                console.log(updatedEvent)
-                
-                const data1 = await PostRequestHelper('addtimesheet', updatedEvent, navigate);
-                console.log(data1);
-                if(data1.status === 201){
-                    setMessage(data1.message)
-                    setShowAlert(true)
-                    setVariant("success")
-                }
-                else if(data1.status === 409 || data1.status === 400){
-                    setMessage(data1.message)
-                    setShowAlert(true)
-                    setVariant("danger")
-                }
-            } catch (err) {
-                console.error('Error fetching data:', err);
-            }
-        }
-        fetchData(); // Call the function to fetch data
-        setOpenAddForm(false)
-    } 
-    getListing()
-  };
-  const addNew = () => {
-    setOpenAddForm(true);
-    setEditItem({
-      id: undefined
-    }); // you need to change the logic for adding unique ID value;
-  };
-  const handleCancelEdit = () => {
-    setOpenAddForm(false);
-  };
+    } catch (error) {
+        console.error('Error accepting recall:', error);
+        setShowAlert(true)
+        setMessage("Error Accepting Recall")
+        setVariant('error')
+    }
+  }
+
   return <React.Fragment>
             <HeaderLayout>
             {showAlert && (
@@ -205,21 +154,10 @@ const Approvals = () => {
                 <Column field='end_date' title='End Date' format="{0:d}"/>
                 <Column field='employee_name'  title='Employee Name'/>
                 <Column field='status' title='Status' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit}/>} />
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} ApproveTimesheet={ApproveTimesheet} AcceptRecall={AcceptRecall}/>} />
             </Grid>
             
-            {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
-            {openDialog && (
-                <Dialog title={"Delete Timesheet"} onClose={toggleDialog} width={350}>
-                    <div>
-                        Are you sure you want to delete the timesheet {selectedItem?.name} with ID {selectedItem?.id}?
-                    </div>
-                    <DialogActionsBar>
-                        <Button onClick={onDeleteData}>Delete</Button>
-                        <Button onClick={toggleDialog}>Cancel</Button>
-                    </DialogActionsBar>
-                </Dialog>
-            )}
+            
 
             <style>
                 {`.k-animation-container {
