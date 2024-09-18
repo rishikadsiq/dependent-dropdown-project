@@ -31,3 +31,13 @@ export const formValidator = values => {
     ['email']: emailValue && emailRegex.test(emailValue) ? '' : 'Email is required and should be in a valid format.'
   };
 };
+export const confirmPasswordValidator = (confirmPassword, form) => {
+  if (!confirmPassword) {
+    return "Confirm password is required";
+  } else if (confirmPassword.length < 8) {
+    return "Confirm password must have a minimum 8 characters";
+  } else if (confirmPassword !== form.password) {
+    return "Passwords do not match";
+  }
+  return "";
+};

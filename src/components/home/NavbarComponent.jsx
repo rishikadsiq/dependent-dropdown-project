@@ -16,20 +16,8 @@ function NavbarComponent() {
   React.useEffect(() => {
     if(!access_token && !refresh_token && !userData)  return navigate('/login')
 },[])
-  console.log(userData);
 
-  // Set circle color based on role
-  const circleColor = userData?.role === 'Admin' ? '#6A9C89' : '#227B94';
-
-  const circleStyle = {
-    display: 'inline-block',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    backgroundColor: circleColor,
-    marginLeft: '8px',
-  };
-
+  
   // Dropdown visibility state
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDropdown1, setShowDropdown1] = useState(false);
@@ -68,9 +56,9 @@ function NavbarComponent() {
                     <NavDropdown.Item href="/users">Users</NavDropdown.Item>
                   </NavDropdown>
                 </div>
-                <Nav.Link href="/approvals">Approvals</Nav.Link>
               </>
             )}
+            <Nav.Link href="/approvals">Approvals</Nav.Link>
             <Nav.Link href="/timesheets">Timesheets</Nav.Link>
           </Nav>
           {/* Right-aligned Nav for user role with hover-controlled dropdown */}

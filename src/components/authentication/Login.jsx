@@ -1,3 +1,4 @@
+import React from 'react';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
@@ -11,59 +12,58 @@ import {
   requiredValidator,
   emailValidator,
 } from './validators'
+import Alerts from '../alerts/Alerts';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [variant, setVariant] = React.useState(null)
 
   const handleSubmit = async (formData) => {
     console.log("Login form submitted", formData);
-    const response = await fetch("http://127.0.0.1:5000/login", {
-      method: 'POST',
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (response.status == 200) {
-      console.log("Login successfully");
-      try {
-        const requestOptions = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        };
-
-        requestOptions.body = JSON.stringify(formData);
-
-        const response = await fetch("http://127.0.0.1:5000/login", requestOptions);
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const response_data = await response.json();
-        console.log(response_data);
-        const { access_token, refresh_token } = response_data;
+    try{
+      const fetchData = await fetch("http://127.0.0.1:5000/login", {
+        method: 'POST',
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const response = await fetchData.json();
+      if (response.status == 200) {
+        setMessage(response.message)
+        setShowAlert(true)
+        setVariant("success")
+        console.log("Login successfully");
+        const { access_token, refresh_token } = response;
         const decoded = jwtDecode(access_token);
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('userData', JSON.stringify(decoded));
         console.log("Navigating to home page...");
         navigate('/');
-      } catch (error) {
-        console.error('Error:', error);
-        throw error;
-      }
-    } else {
-      console.error("Failed to submit form data:", response.message);
+        } else if(response.status === 401){
+          setShowAlert(true)
+          setVariant('danger')
+          setMessage(response.message)
+        }
+    } catch(error){
+      console.error('Error logging in:', error);
     }
+    
   };
 
   return (
     <Container>
+      {showAlert && (
+                <div>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
       <div className="d-flex align-items-center justify-content-center vh-100 h4 flex-column">
         <h1>Get started with TimeChronos</h1>
         <h3>Login</h3>

@@ -42,7 +42,7 @@ const AddClient = props => {
                   />
                 </div>
                 <div className="mb-3">
-                  <Field name={"phone"} component={Input} label={"Contact"}/>
+                  <Field name={"phone"} component={Input} label={"Phone"}/>
                 </div>
               </fieldset>
               <div className="k-form-buttons">

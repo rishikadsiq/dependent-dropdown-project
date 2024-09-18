@@ -57,7 +57,7 @@ const EditForm = props => {
                   />
                 </div>
                 <div className="mb-3">
-                  <Field name={"phone"} component={Input} label={"Contact"} validator={requiredValidator}/>
+                  <Field name={"phone"} component={Input} label={"Phone"} validator={requiredValidator}/>
                 </div>
                 <div className="mb-3">
                   <Field  

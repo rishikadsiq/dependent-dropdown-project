@@ -212,7 +212,7 @@ const Clients = () => {
                 <Column field="id" title="ID" />
                 <Column field='name' title='Client Name' />
                 <Column field='email' title='Email' />
-                <Column field='phone' title='Contact' />
+                <Column field='phone' title='Phone' />
                 <Column field='is_active' title='Active' />
                 <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
             </Grid>

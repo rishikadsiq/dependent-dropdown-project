@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
+import { AutoComplete, DropDownList } from '@progress/kendo-react-dropdowns';
 import {GetRequestHelper} from  '../helper/GetRequestHelper'
 import {PostRequestHelper} from  '../helper/PostRequestHelper'
 import { useNavigate } from 'react-router-dom';
@@ -15,32 +15,45 @@ import { Form, Field, FormElement } from '@progress/kendo-react-form';
 
 
 const DropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataClients }) => {
-  const handleChange = e => {
-    if (onChange) {
+  const [value, setValue] = React.useState(client ? dataClients.find(c => c.value === client)?.text : ''); // Track typed value
+
+  const handleChange = (e) => {
+    const selectedValue = e.target.value;
+    setValue(selectedValue); // Update local input value
+    
+    // Find the corresponding client object based on input
+    const selectedClient = dataClients.find(c => c.text === selectedValue);
+
+    if (onChange && selectedClient) {
       onChange({
         dataIndex: 0,
         dataItem: dataItem,
         field: field,
         syntheticEvent: e.syntheticEvent,
-        value: e.target.value.value
+        value: selectedClient.value
       });
     }
-    setClient(e.target.value.value)
-    setProject(null)
-    setTask(null)
+
+    if (selectedClient) {
+      setClient(selectedClient.value);
+      setProject(null);  // Reset project and task when client changes
+      setTask(null);
+    }
   };
+
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
   return (
     <td>
       {dataItem.inEdit ? (
-        <DropDownList
+        <AutoComplete
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={dataClients.find(c => c.value === client)}
+          value={value} // The value now reflects the typed input
           data={dataClients}
-          textField="text"
-          dataItemKey="value"
+          textField="text" // Specifies which field to display as the text
+          dataItemKey="value" // Specifies the key used to identify each item
+          placeholder="Type to search client..." // Optional placeholder
         />
       ) : dataValue == null ? (
         ''
@@ -52,36 +65,46 @@ const DropDownCell = ({ dataItem, field, onChange, client, project, task, setCli
 };
 
 const ProjectDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataProjects }) => {
-  const handleChange = e => {
-    if (onChange) {
+  const [value, setValue] = React.useState(project ? dataProjects.find(p => p.value === project)?.text : ''); // Track typed value
+
+  const handleChange = (e) => {
+    const selectedValue = e.target.value;
+    setValue(selectedValue); // Update local input value
+
+    // Find the corresponding project object based on input
+    const selectedProject = dataProjects.find(p => p.text === selectedValue);
+
+    if (onChange && selectedProject) {
       onChange({
         dataIndex: 0,
         dataItem,
         field,
         syntheticEvent: e.syntheticEvent,
-        value: e.target.value.value
+        value: selectedProject.value
       });
     }
-    setProject(e.target.value.value)
-    setClient(e.target.value.client_id)
-    setTask(null)
+
+    if (selectedProject) {
+      setProject(selectedProject.value);
+      setClient(selectedProject.client_id);  // Automatically select the corresponding client
+      setTask(null);  // Reset the task when the project changes
+    }
   };
 
-  const selectedClient = dataItem.client_name;
-  const filteredProjects = dataProjects.filter(p => p.client_id === client);
-
+  const filteredProjects = dataProjects.filter(p => p.client_id === client); // Filter projects based on selected client
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
   return (
     <td>
       {dataItem.inEdit ? (
-        <DropDownList
+        <AutoComplete
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={dataProjects.find(p => p.value === project)}
-          data={client ? filteredProjects : dataProjects}
-          textField="text"
-          dataItemKey="value"
+          value={value} // The value now reflects the typed input
+          data={client ? filteredProjects : dataProjects} // Filtered projects based on the selected client
+          textField="text" // Specifies which field to display as the text
+          dataItemKey="value" // Specifies the key used to identify each item
+          placeholder="Type to search project..." // Optional placeholder for guidance
         />
       ) : dataValue == null ? (
         ''
@@ -93,38 +116,46 @@ const ProjectDropDownCell = ({ dataItem, field, onChange, client, project, task,
 };
 
 const TaskDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataTasks }) => {
-  const handleChange = e => {
-    if (onChange) {
+  const [value, setValue] = React.useState(task ? dataTasks.find(t => t.value === task)?.text : ''); // Track typed value
+
+  const handleChange = (e) => {
+    const selectedValue = e.target.value;
+    setValue(selectedValue); // Update local input value
+
+    // Find the corresponding task object based on input
+    const selectedTask = dataTasks.find(t => t.text === selectedValue);
+
+    if (onChange && selectedTask) {
       onChange({
         dataIndex: 0,
         dataItem,
         field,
         syntheticEvent: e.syntheticEvent,
-        value: e.target.value.value
+        value: selectedTask.value
       });
-      setTask(e.target.value.value)
-      setProject(e.target.value.project_id)
-      setClient(e.target.value.client_id)
     }
 
+    if (selectedTask) {
+      setTask(selectedTask.value);
+      setProject(selectedTask.project_id); // Automatically select the corresponding project
+      setClient(selectedTask.client_id);  // Automatically select the corresponding client
+    }
   };
 
-  const selectedClient = dataItem.client_name;
-  const selectedProject = dataItem.project_name;
-  const filteredTasks = dataTasks.filter(t => t.client_id === client && t.project_id === project);
-
+  const filteredTasks = dataTasks.filter(t => t.client_id === client && t.project_id === project); // Filter tasks based on client and project
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
 
   return (
     <td>
       {dataItem.inEdit ? (
-        <DropDownList
+        <AutoComplete
           style={{ width: '100px' }}
           onChange={handleChange}
-          value={dataTasks.find(t => t.value === task)}
-          data={(client && project) ? filteredTasks : client ? dataTasks.filter(t => t.client_id === client) : dataTasks}
-          textField="text"
-          dataItemKey="value"
+          value={value} // The value now reflects the typed input
+          data={(client && project) ? filteredTasks : client ? dataTasks.filter(t => t.client_id === client) : dataTasks} // Filter tasks based on client and project
+          textField="text" // Specifies which field to display as the text
+          dataItemKey="value" // Specifies the key used to identify each item
+          placeholder="Type to search task..." // Optional placeholder
         />
       ) : dataValue == null ? (
         ''

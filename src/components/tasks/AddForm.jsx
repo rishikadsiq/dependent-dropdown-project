@@ -82,7 +82,7 @@ const EditForm = (props) => {
                     data={projectData}
                     textField="name"
                     dataItemKey="project_id"
-                    label="Project Name"
+                    label="Project Name *"
                     validator={requiredValidator}
                   />
                 )}

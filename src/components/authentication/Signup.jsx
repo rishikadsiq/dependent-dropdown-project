@@ -1,8 +1,10 @@
+import React from 'react';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from "@progress/kendo-react-inputs";
+import Alerts from '../alerts/Alerts';
 
 import {
   FormInput,
@@ -14,11 +16,15 @@ import {
   emailValidator,
   passwordValidator,
   phoneValidator,
+  confirmPasswordValidator,
 
 } from './validators'
 
 const Signup = () => {
   const navigate = useNavigate()
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [variant, setVariant] = React.useState(null)
   const genderData = [
     { label: 'Female', value: 'female' },
     { label: 'Male', value: 'male' },
@@ -42,16 +48,31 @@ const Signup = () => {
         "Content-Type": "application/json",
       },
     });
-    if (response.ok) {
+    const response1 = await response.json()
+    console.log(response1)
+    if (response1.status===201) {
       console.log("Form data submitted successfully!");
+      setMessage(response1.message)
+      setShowAlert(true)
+      setVariant("success")
       navigate('/login');
-    } else {
+    } else if(response1.status === 409){
+      console.log(response1.message)
+      setMessage(response1.message)
+      setShowAlert(true)
+      setVariant("danger")
+    }else {
       console.error("Failed to submit form data:", response.message);
     }
   }
 
   return (
     <Container className='vh-100 mt-3 mb-5'>
+      {showAlert && (
+                <div>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
       <div className="d-flex align-items-center justify-content-center vh-100 h4 flex-column">
         <h1>Get started with TimeChronos</h1>
         <p>Create a free account to start tracking time and superchange</p>
@@ -112,6 +133,7 @@ const Signup = () => {
                     id={'password'}
                     name={'password'}
                     label={'Password *'}
+                    type={'password'}
                     component={FormInput}
                     validator={passwordValidator}
                   />
@@ -119,8 +141,9 @@ const Signup = () => {
                     id={'retype_password'}
                     name={'retype_password'}
                     label={'Re-type Password *'}
+                    type={'password'}
                     component={FormInput}
-                    validator={passwordValidator}
+                    validator={confirmPasswordValidator}
                   />
 
                   <div className="k-form-buttons">
