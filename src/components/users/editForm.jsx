@@ -120,19 +120,26 @@ const EditForm = (props) => {
     );
   };
 
-  const CheckBoxField = (fieldRenderProps) => (
-    <div>
-      <label className="k-label">{fieldRenderProps.label}</label>
-      <Checkbox
-        checked={fieldRenderProps.value}
-        onChange={(e) => fieldRenderProps.onChange({ value: e.target.checked })}
-        name={fieldRenderProps.name}
-      />
-      {fieldRenderProps.visited && fieldRenderProps.error && (
-        <div className="k-required">{fieldRenderProps.error}</div>
-      )}
-    </div>
-  );
+  const CheckBoxField = ({ label, value, onChange, name, visited, error }) => {
+    const handleChange = (e) => {
+      console.log('Checkbox Checked:', e.target.value);
+      onChange({ value: e.target.value }); // Pass updated value
+    };
+  
+    return (
+      <div>
+        <label className="k-label">{label}</label>
+        <Checkbox
+          checked={value || false} // Default to false if value is undefined
+          onChange={handleChange}
+          name={name}
+        />
+        {visited && error && (
+          <div className="k-required">{error}</div>
+        )}
+      </div>
+    );
+  };
   
 
   return (

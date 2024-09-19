@@ -11,15 +11,27 @@ import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
 
 const EditCommandCell = props => {
-  return <td>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-                Edit
-            </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
-                Delete
-            </Button>
-        </td>;
-};
+    return (
+      <td>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          style={{ marginRight: '10px' }} // Adds space between buttons
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
+          Edit
+        </Button>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.remove(props.dataItem)}
+        >
+          Delete
+        </Button>
+      </td>
+    );
+  };
+  
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Clients = () => {
     const [openAddForm, setOpenAddForm] = React.useState(false);
@@ -42,7 +54,11 @@ const Clients = () => {
         if (data1.status === 404) {
             setData([]);
         } else {
-            setData(data1.clients);
+          const updatedData = data1.clients.map((client, index) => ({
+            ...client,
+            new_id: index+1 // Add or update 'new_id' column with serialized data
+          }));
+          setData(updatedData);
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -118,6 +134,8 @@ const Clients = () => {
                     setMessage(data1.message)
                     setShowAlert(true)
                     setVariant("success")
+                    localStorage.setItem('selectedClientRecentlyAdded', JSON.stringify({'name': data1.name, 'id': data1.id}));
+                    navigate('/projects')
                 }
                 else if(data1.status === 409 || data1.status === 400){
                     setMessage(data1.message)
@@ -185,19 +203,13 @@ const Clients = () => {
     setOpenAddForm(false);
 };
   return <React.Fragment>
-    <HeaderLayout>
+            <HeaderLayout>
             {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
-                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                <div className='container'>
+                    <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
             )}
+
             
             {/* Main content with header and grid */}
             <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
@@ -209,7 +221,7 @@ const Clients = () => {
                         Add new
                     </Button>
                 </GridToolbar>
-                <Column field="id" title="ID" />
+                <Column field="new_id" title="ID" />
                 <Column field='name' title='Client Name' />
                 <Column field='email' title='Email' />
                 <Column field='phone' title='Phone' />

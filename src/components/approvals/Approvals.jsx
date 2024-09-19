@@ -3,55 +3,52 @@ import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-g
 import { Button } from "@progress/kendo-react-buttons";
 import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import Alerts from '../alerts/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
 
 
 const EditCommandCell = props => {
-    const { status } = props.dataItem;
-  
-    return (
-      <td>
-        {status === 'REJECTED' && (
-          <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-            Show
-          </Button>
-        )}
-  
-  
-        {status === 'APPROVED' && (
-          <>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-              Show
-            </Button>
-          </>
-        )}
-        {status === 'RECALLED' && (
-          <>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-              Show
-            </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.AcceptRecall(props.dataItem)}>
-              Accept Recall
-            </Button>
-          </>
-        )}
-  
-        {status === 'PENDING' && (
-          <>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-              Show
-            </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.ApproveTimesheet(props.dataItem)}>
-              Approve
-            </Button>
-          </>
-        )}
-      </td>
-    );
-  };
+  const { status } = props.dataItem;
+
+  return (
+    <td>
+      {/* Show button appears for multiple statuses */}
+      {['REJECTED', 'APPROVED', 'RECALLED', 'PENDING'].includes(status) && (
+        <Button
+          themeColor={'primary'}
+          type="button"
+          style={{ marginRight: '10px' }} // Adds spacing between buttons
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
+          Show
+        </Button>
+      )}
+
+      {/* Additional buttons for specific statuses */}
+      {status === 'RECALLED' && (
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.AcceptRecall(props.dataItem)}
+        >
+          Accept Recall
+        </Button>
+      )}
+
+      {status === 'PENDING' && (
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.ApproveTimesheet(props.dataItem)}
+        >
+          Approve
+        </Button>
+      )}
+    </td>
+  );
+};
+
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Approvals = () => {
     const [data, setData] = React.useState([]);
@@ -72,6 +69,7 @@ const Approvals = () => {
             console.log(data1)
             const updatedData = data1.timesheets.map((item, index) => ({
                 ...item, // Spread the other properties
+                new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
@@ -130,14 +128,7 @@ const Approvals = () => {
   return <React.Fragment>
             <HeaderLayout>
             {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
+                <div className='container'>
                 <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
             )}
@@ -148,7 +139,7 @@ const Approvals = () => {
             </div>
             <Grid data={data}>
                 
-                <Column field="id" title="ID" />
+                <Column field="new_id" title="ID" />
                 <Column field='name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>

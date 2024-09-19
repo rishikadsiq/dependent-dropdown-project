@@ -17,41 +17,69 @@ const EditCommandCell = props => {
   return (
     <td>
       {['DRAFT', 'REJECTED'].includes(approval) && (
-        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          style={{ marginRight: '10px' }} // Add spacing between buttons
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
           Edit
         </Button>
       )}
 
       {approval === 'DRAFT' && (
-        <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.remove(props.dataItem)}
+        >
           Delete
         </Button>
       )}
 
       {approval === 'APPROVED' && (
         <>
-          <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+          <Button
+            themeColor={'primary'}
+            type="button"
+            style={{ marginRight: '10px' }} // Add spacing between buttons
+            onClick={() => props.enterEdit(props.dataItem)}
+          >
             Show
           </Button>
-          <Button themeColor={'primary'} type="button" onClick={() => props.recall(props.dataItem)}>
+          <Button
+            themeColor={'primary'}
+            type="button"
+            onClick={() => props.recall(props.dataItem)}
+          >
             Recall
           </Button>
         </>
       )}
 
       {approval === 'PENDING' && (
-        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
           Show
         </Button>
       )}
+
       {approval === 'RECALLED' && (
-        <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
           Show
         </Button>
       )}
     </td>
   );
 };
+
 
 
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
@@ -79,6 +107,7 @@ const Timesheets = () => {
             console.log(data1)
             const updatedData = data1.timesheets.map((item, index) => ({
                 ...item, // Spread the other properties
+                new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
@@ -216,14 +245,7 @@ const Timesheets = () => {
   return <React.Fragment>
             <HeaderLayout>
             {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
+                <div className='container'>
                 <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
             )}
@@ -238,7 +260,7 @@ const Timesheets = () => {
                         Add new
                     </Button>
                 </GridToolbar>
-                <Column field="id" title="ID" />
+                <Column field="new_id" title="ID" />
                 <Column field='name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>

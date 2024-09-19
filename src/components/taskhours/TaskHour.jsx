@@ -11,6 +11,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import Alerts from '../alerts/Alerts';
 import { TextArea } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
+import CardComponent from './CardComponent';
 
 
 
@@ -194,6 +195,7 @@ const TaskHour = () => {
   const [showAlert, setShowAlert] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
+  const [showCard, setShowCard] = React.useState(false)
 
   const { timesheetId } = useParams();
   const navigate = useNavigate();
@@ -229,6 +231,17 @@ const TaskHour = () => {
 
     getMetadata();
   }, []);
+
+  React.useEffect(() => {
+    if(!clientData.length && !projectData.length && !taskData.length){
+      setShowCard(true)
+    }
+  },[clientData, projectData, taskData])
+  React.useEffect(() => {
+    if(clientData.length && projectData.length && taskData.length){
+      setShowCard(false)
+    }
+  },[clientData, projectData, taskData])
 
   const getListing = async () => {
     try {
@@ -394,7 +407,11 @@ const TaskHour = () => {
     <td>
       {!props.dataItem.inEdit ? (
         <>
-          <Button themeColor={'primary'} onClick={() => enterEdit(props.dataItem)}>
+          <Button
+            themeColor={'primary'}
+            style={{ marginRight: '10px' }} // Add margin between buttons
+            onClick={() => enterEdit(props.dataItem)}
+          >
             Edit
           </Button>
           <Button onClick={() => remove(props.dataItem)}>
@@ -403,7 +420,11 @@ const TaskHour = () => {
         </>
       ) : (
         <>
-          <Button themeColor={'primary'} onClick={() => save(props.dataItem)}>
+          <Button
+            themeColor={'primary'}
+            style={{ marginRight: '10px' }} // Add margin between buttons
+            onClick={() => save(props.dataItem)}
+          >
             {props.dataItem.id ? 'Update' : 'Add'}
           </Button>
           <Button onClick={() => cancel(props.dataItem)}>
@@ -413,6 +434,7 @@ const TaskHour = () => {
       )}
     </td>
   );
+  
 
   const handleApprovalSubmit = async(dataItem) => {
     try {
@@ -441,16 +463,14 @@ const TaskHour = () => {
     <div>
           <HeaderLayout>
           {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
+                <div className='container'>
                 <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
+            )}
+            {showCard && (
+              <div>
+                <CardComponent />
+              </div>
             )}
             
             {/* Main content with header and grid */}
@@ -478,7 +498,7 @@ const TaskHour = () => {
           }
         }}
       >
-        {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
+        {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <GridToolbar>
             <Button title="Add new" type="button" onClick={enterInsert}>
               Add new
@@ -487,7 +507,7 @@ const TaskHour = () => {
         )}
           
       
-        <Column field="id" title="Id" editable={false} width={"50px"}/>
+        <Column field="new_id" title="Id" editable={false} width={"50px"}/>
         <Column field="client_name" title="Client Name" cell={props=>
           <DropDownCell 
             {...props} 
@@ -534,7 +554,7 @@ const TaskHour = () => {
         <Column field="fri" title="Fri" editor="numeric" />
         <Column field="sat" title="Sat" editor="numeric" />
         <Column field="sun" title="Sun" editor="numeric" />
-        {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
+        {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <Column cell={MyCommandCell} title="Actions" />
         )}
         
@@ -551,7 +571,7 @@ const TaskHour = () => {
                     </DialogActionsBar>
                 </Dialog>
             )}
-      {(timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && (
+      {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <div className='mt-3'>
             <div className='mb-3'>
             <Form onSubmit={handleApprovalSubmit} render={formRenderProps =>

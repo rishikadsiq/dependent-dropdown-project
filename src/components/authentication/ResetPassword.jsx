@@ -1,13 +1,31 @@
+import React from 'react';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FormInput } from './form-components';
 import { passwordValidator } from './validators';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // 
 
 const ResetPassword = () => {
     const navigate = useNavigate();
     const { code } = useParams();
+    const [showPassword, setShowPassword] = React.useState(false);  
+    const [showRetypePassword, setShowRetypePassword] = React.useState(false);  
+    const confirmPasswordValidator = (retypePassword, password) => {
+        if (retypePassword !== password) {
+            return "Passwords do not match.";
+        }
+        return "";
+    };
+    const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+    };
+
+    const toggleRetypePasswordVisibility = () => {
+    setShowRetypePassword(!showRetypePassword);
+    };
 
     const handleSubmit = async (formData) => {
         console.log("Reset Password form submitted", formData);
@@ -37,20 +55,55 @@ const ResetPassword = () => {
                         <Form onSubmit={handleSubmit} render={formRenderProps =>
                             <FormElement>
                                 <fieldset className={'k-form-fieldset'}>
-                                    <Field
+                                    {/* Password Field */}
+                                    <div className="position-relative">
+                                        <Field
                                         id={'password'}
                                         name={'password'}
                                         label={'Password *'}
+                                        type={showPassword ? 'text' : 'password'}
                                         component={FormInput}
                                         validator={passwordValidator}
-                                    />
-                                    <Field
+                                        />
+                                        <button
+                                        type="button"
+                                        className="btn btn-link position-absolute"
+                                        onClick={togglePasswordVisibility}
+                                        style={{
+                                            top: '50%',
+                                            right: '5px',  // Adjusted for better right alignment
+                                            transform: 'translateY(-20%)',
+                                            padding: 0,
+                                        }}
+                                        >
+                                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
+
+                                    {/* Re-type Password Field */}
+                                    <div className="position-relative">
+                                        <Field
                                         id={'retype_password'}
                                         name={'retype_password'}
                                         label={'Re-type Password *'}
+                                        type={showRetypePassword ? 'text' : 'password'}
                                         component={FormInput}
-                                        validator={passwordValidator}
-                                    />
+                                        validator={(value) => confirmPasswordValidator(value, formRenderProps.valueGetter('password'))}
+                                        />
+                                        <button
+                                        type="button"
+                                        className="btn btn-link position-absolute"
+                                        onClick={toggleRetypePasswordVisibility}
+                                        style={{
+                                            top: '50%',
+                                            right: '5px',  // Adjusted for better right alignment
+                                            transform: 'translateY(-20%)',
+                                            padding: 0,
+                                        }}
+                                        >
+                                        <FontAwesomeIcon icon={showRetypePassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
                                     <div className="k-form-buttons">
                                         <Button
                                             themeColor={"primary"}

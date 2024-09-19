@@ -19,10 +19,11 @@ const Login = () => {
   const [showAlert, setShowAlert] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
+  const [showPassword, setShowPassword] = React.useState(false); // State for toggling password visibility
 
   const handleSubmit = async (formData) => {
     console.log("Login form submitted", formData);
-    try{
+    try {
       const fetchData = await fetch("http://127.0.0.1:5000/login", {
         method: 'POST',
         body: JSON.stringify({
@@ -34,10 +35,10 @@ const Login = () => {
         },
       });
       const response = await fetchData.json();
-      if (response.status == 200) {
-        setMessage(response.message)
-        setShowAlert(true)
-        setVariant("success")
+      if (response.status === 200) {
+        setMessage(response.message);
+        setShowAlert(true);
+        setVariant("success");
         console.log("Login successfully");
         const { access_token, refresh_token } = response;
         const decoded = jwtDecode(access_token);
@@ -46,24 +47,27 @@ const Login = () => {
         localStorage.setItem('userData', JSON.stringify(decoded));
         console.log("Navigating to home page...");
         navigate('/');
-        } else if(response.status === 401){
-          setShowAlert(true)
-          setVariant('danger')
-          setMessage(response.message)
-        }
-    } catch(error){
+      } else if (response.status === 401) {
+        setShowAlert(true);
+        setVariant('danger');
+        setMessage(response.message);
+      }
+    } catch (error) {
       console.error('Error logging in:', error);
     }
-    
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword); // Toggle the showPassword state
   };
 
   return (
     <Container>
       {showAlert && (
-                <div>
-                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
-                </div>
-            )}
+        <div>
+          <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+        </div>
+      )}
       <div className="d-flex align-items-center justify-content-center vh-100 h4 flex-column">
         <h1>Get started with TimeChronos</h1>
         <h3>Login</h3>
@@ -79,13 +83,33 @@ const Login = () => {
                     component={FormInput}
                     validator={emailValidator}
                   />
-                  <Field
-                    id={'password'}
-                    name={'password'}
-                    label={'Password *'}
-                    component={FormInput}
-                    validator={requiredValidator}
-                  />
+                  
+                  {/* Password Field with Toggle Visibility */}
+                  <div className="position-relative">
+                    <Field
+                      id={'password'}
+                      name={'password'}
+                      label={'Password *'}
+                      type={showPassword ? 'text' : 'password'}  // Toggle between text and password
+                      component={FormInput}
+                      validator={requiredValidator}
+                    />
+                  </div>
+
+                  {/* Show Password Checkbox */}
+                  <div className="form-check mt-2">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="showPassword"
+                      onChange={togglePasswordVisibility}
+                      checked={showPassword} // Sync with state
+                    />
+                    <label className="form-check-label" htmlFor="showPassword">
+                      Show Password
+                    </label>
+                  </div>
+
                   <div className="d-flex justify-content-between align-items-center mt-3">
                     <Button
                       themeColor={"primary"}

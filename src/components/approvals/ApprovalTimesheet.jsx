@@ -84,7 +84,7 @@ const ApprovalTimesheet = () => {
       <Grid
         data={data}
       >
-        <Column field="id" title="Id" width={"50px"}/>
+        <Column field="new_id" title="Id" width={"50px"}/>
         <Column field="client_name" title="Client Name" />
         <Column field="project_name" title="Project Name" />
         <Column field="task_name" title="Task Name" />

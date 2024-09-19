@@ -12,15 +12,27 @@ import { useNavigate } from "react-router-dom";
 
 
 const EditCommandCell = props => {
-  return <td>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-                Edit
-            </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
-                Delete
-            </Button>
-        </td>;
-};
+    return (
+      <td>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          style={{ marginRight: '10px' }} // Adds space between buttons
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
+          Edit
+        </Button>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.remove(props.dataItem)}
+        >
+          Delete
+        </Button>
+      </td>
+    );
+  };
+  
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Tasks = () => {
     const [openEditForm, setOpenEditForm] = React.useState(false);
@@ -49,6 +61,7 @@ const Tasks = () => {
             console.log(data1)
             const updatedData = data1.tasks.map((item, index) => ({
                 ...item, // Spread the other properties
+                new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
@@ -163,9 +176,9 @@ const Tasks = () => {
                       });
                       return changedData;
                     }
-                  
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
+                    localStorage.setItem('to_be_add', JSON.stringify(changedData));
                 console.log(changedData) 
                 const data1 = await PostRequestHelper('updatetask', changedData, navigate);
                 console.log(data1);
@@ -217,8 +230,8 @@ const Tasks = () => {
                 const parsedData = JSON.parse(toBeAdded)
                 const response = await PostRequestHelper('addduplicatetask', parsedData, navigate)
                 console.log(response)
-                if(response.status === 201) {
-                    setMessage(response.message)
+                if(response.status === 201 || response.status ===200) {
+                        setMessage(response.message)
                         setShowAlert(true)
                         setVariant("success")
                         localStorage.removeItem('to_be_add');
@@ -236,14 +249,7 @@ const Tasks = () => {
   return <React.Fragment>
             <HeaderLayout>
             {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
+                <div className='container'>
                 <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
             )}
@@ -279,7 +285,7 @@ const Tasks = () => {
                         Add new
                     </Button>
                 </GridToolbar>
-                <Column field="id" title="ID" />
+                <Column field="new_id" title="ID" />
                 <Column field='name' title='Task Name' />
                 <Column field='project_name' title='Project Name' />
                 <Column field='client_name' title='Client Name' />

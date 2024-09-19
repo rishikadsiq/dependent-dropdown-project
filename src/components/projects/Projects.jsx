@@ -12,15 +12,27 @@ import { useNavigate } from "react-router-dom";
 
 
 const EditCommandCell = props => {
-  return <td>
-            <Button themeColor={'primary'} type="button" onClick={() => props.enterEdit(props.dataItem)}>
-                Edit
-            </Button>
-            <Button themeColor={'primary'} type="button" onClick={() => props.remove(props.dataItem)}>
-                Delete
-            </Button>
-        </td>;
-};
+    return (
+      <td>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          style={{ marginRight: '10px' }} // Adds space between buttons
+          onClick={() => props.enterEdit(props.dataItem)}
+        >
+          Edit
+        </Button>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() => props.remove(props.dataItem)}
+        >
+          Delete
+        </Button>
+      </td>
+    );
+  };
+  
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Projects = () => {
     const [openEditForm, setOpenEditForm] = React.useState(false);
@@ -50,6 +62,7 @@ const Projects = () => {
             console.log(data1)
             const updatedData = data1.projects.map((item, index) => ({
                 ...item, // Spread the other properties
+                new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
@@ -237,14 +250,7 @@ const Projects = () => {
   return <React.Fragment>
             <HeaderLayout>
             {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: "45px",
-                    left: 0,
-                    right: 0,
-                    zIndex: 10003,
-                    padding: '1rem',
-                }} className='container'>
+                <div className='container'>
                 <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
                 </div>
             )}
@@ -280,7 +286,7 @@ const Projects = () => {
                         Add new
                     </Button>
                 </GridToolbar>
-                <Column field="id" title="ID" />
+                <Column field="new_id" title="ID" />
                 <Column field='name' title='Project Name' />
                 <Column field='client_name' title='Client Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
