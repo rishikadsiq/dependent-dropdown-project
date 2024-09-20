@@ -6,9 +6,10 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
 import EditForm from './editForm';
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
+import { filterBy } from "@progress/kendo-data-query";
 
 
 const EditCommandCell = props => {
@@ -35,6 +36,11 @@ const EditCommandCell = props => {
   
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Projects = () => {
+    const initialFilter = {
+        logic: "and", // or "or"
+        filters: []
+      };
+        const [filter, setFilter] = React.useState(initialFilter);
     const [openEditForm, setOpenEditForm] = React.useState(false);
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
@@ -280,7 +286,13 @@ const Projects = () => {
                 </DialogActionsBar>
                 </Dialog>
             )}
-            <Grid data={data}>
+            <Grid
+              data={filterBy(data, filter)}
+              navigatable={true}
+              filterable={true}
+              filter={filter}
+              onFilterChange={(e) => setFilter(e.filter)}
+            >
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
                         Add new
@@ -289,10 +301,10 @@ const Projects = () => {
                 <Column field="new_id" title="ID" />
                 <Column field='name' title='Project Name' />
                 <Column field='client_name' title='Client Name' />
-                <Column field='start_date' title='Start Date' format="{0:d}"/>
-                <Column field='end_date' title='End Date' format="{0:d}"/>
-                <Column field='is_active' title='Active' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
+                <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
+                <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
+                <Column field='is_active' title='Active' filter='boolean'/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} filterable={false}/>
             </Grid>
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}

@@ -8,12 +8,19 @@ import { useNavigate } from 'react-router-dom';
 import HeaderLayout from '../home/HeaderLayout'
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import { TextArea } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import CardComponent from './CardComponent';
+import { filterBy } from "@progress/kendo-data-query";
+import { RangeFilterCell } from "../dynamic-compoenents/rangeFilterCell";
+import { NumericTextBox } from '@progress/kendo-react-inputs';
 
 
+
+const numericValidator = (value) => {
+  return value <= 24 ? "" : "The value must be less than or equal to 24";
+};
 
 const DropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataClients }) => {
   const [value, setValue] = React.useState(client ? dataClients.find(c => c.value === client)?.text : ''); // Track typed value
@@ -182,6 +189,11 @@ const MyNumericCustomCell = props => <CustomCell {...props} color="lightgreen" /
 const MyBooleanCustomCell = props => <CustomCell {...props} color="pink" />;
 
 const TaskHour = () => {
+  const initialFilter = {
+    logic: "and", // or "or"
+    filters: []
+  };
+    const [filter, setFilter] = React.useState(initialFilter);
   const [data, setData] = React.useState([]);
   const [timesheetData, setTimesheetData] = React.useState([]);
   const [clientData, setClientData] = React.useState([]);
@@ -318,19 +330,38 @@ const TaskHour = () => {
     fetchData(); 
     }
     else{
-      const updatedDataItem = [{
-        values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
+      const updatedDataItem = {
+        ...dataItem,
         task_id: task,
         timesheet_id: timesheetId,
         id: dataItem.id
-      }];
-      delete updatedDataItem.inEdit;
-      console.log(updatedDataItem)
+      };
+      
+      // Find the original data item by matching the `id`
+      const originalData = data.find(item => item.id === updatedDataItem.id);
+      
+      // Function to find changed properties in the event object compared to originalData
+      function getChangedData(original, updated) {
+        const changedData = {};
+        Object.keys(updated).forEach(key => {
+          if (updated[key] !== original[key]) {
+            changedData[key] = updated[key];
+          }
+        });
+        return changedData;
+      }
+      
+      // Get the changed data and ensure the `id` is included
+      const changedData = getChangedData(originalData, updatedDataItem);
+      changedData['id'] = updatedDataItem.id;
+      changedData['values'] = [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun]
+      
+      console.log(changedData);
       
       const fetchData = async() => {
         try {
           console.log(updatedDataItem)
-            const data1 = await PostRequestHelper('updatetaskhours', updatedDataItem[0], navigate);
+            const data1 = await PostRequestHelper('updatetaskhours', changedData, navigate);
             console.log(data1);
             if(data1.status === 200){
                 setMessage(data1.message)
@@ -435,6 +466,48 @@ const TaskHour = () => {
     </td>
   );
   
+  const NumericCell = ({ dataItem, field, onChange }) => {
+    const handleChange = (e) => {
+      const value = e.value;
+      onChange({
+        dataIndex: 0,
+        dataItem,
+        field,
+        syntheticEvent: e.syntheticEvent,
+        value,
+      });
+    };
+  
+    return (
+      <td>
+        {dataItem.inEdit ? (
+          <Field
+            name={field}
+            validator={() => numericValidator(dataItem[field])} // Apply validator here
+            render={({ validationMessage, value, ...fieldRenderProps }) => (
+              <>
+                <NumericTextBox
+                  {...fieldRenderProps}
+                  value={value === null ? 0 : value}
+                  onChange={handleChange}
+                  min={0} // Optional: Set minimum value
+                  max={24} // Set max value to 24 for NumericTextBox
+                  width="100%"
+                />
+                {validationMessage && (
+                  <div style={{ color: "red" }}>{validationMessage}</div>
+                )}
+              </>
+            )}
+          />
+        ) : (
+          dataItem[field]
+        )}
+      </td>
+    );
+  };
+  
+  
 
   const handleApprovalSubmit = async(dataItem) => {
     try {
@@ -487,7 +560,11 @@ const TaskHour = () => {
             </Grid>
             </div>
       <Grid
-        data={data}
+        data={filterBy(data, filter)}
+        navigatable={true}
+        filterable={true}
+        filter={filter}
+        onFilterChange={(e) => setFilter(e.filter)}
         onItemChange={itemChange}
         editField="inEdit"
         cells={{
@@ -547,15 +624,15 @@ const TaskHour = () => {
           />} 
           editor="text" 
         />
-        <Column field="mon" title="Mon" editor="numeric" />
-        <Column field="tue" title="Tue" editor="numeric" />
-        <Column field="wed" title="Wed" editor="numeric" />
-        <Column field="thu" title="Thu" editor="numeric" />
-        <Column field="fri" title="Fri" editor="numeric" />
-        <Column field="sat" title="Sat" editor="numeric" />
-        <Column field="sun" title="Sun" editor="numeric" />
+        <Column field="mon" title="Mon" editor="numeric" format="{0:n}" filterCell={RangeFilterCell}/>
+        <Column field="tue" title="Tue" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+        <Column field="wed" title="Wed" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+        <Column field="thu" title="Thu" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+        <Column field="fri" title="Fri" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+        <Column field="sat" title="Sat" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+        <Column field="sun" title="Sun" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
         {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
-          <Column cell={MyCommandCell} title="Actions" />
+          <Column cell={MyCommandCell} title="Actions" filterable={false}/>
         )}
         
           

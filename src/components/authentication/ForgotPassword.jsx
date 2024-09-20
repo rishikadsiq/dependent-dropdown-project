@@ -10,8 +10,7 @@ import {
 import {
   emailValidator,
 } from './validators'
-
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

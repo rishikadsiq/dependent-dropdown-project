@@ -4,7 +4,7 @@ import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { RadioGroup } from "@progress/kendo-react-inputs";
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import { FormInput, FormMaskedTextBox } from './form-components';
 import { requiredValidator, emailValidator, passwordValidator, phoneValidator } from './validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -55,6 +55,7 @@ const Signup = () => {
       setMessage(response1.message);
       setShowAlert(true);
       setVariant("success");
+      localStorage.setItem('thankyou_message',JSON.stringify(response1));
       navigate('/login');
     } else if (response1.status === 409) {
       console.log(response1.message);

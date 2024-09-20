@@ -3,9 +3,11 @@ import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-g
 import { Button } from "@progress/kendo-react-buttons";
 import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
+import { filterBy } from "@progress/kendo-data-query";
+import { DropdownFilterCell } from '../dynamic-compoenents/dropdownFilterCell';
 
 
 const EditCommandCell = props => {
@@ -51,6 +53,11 @@ const EditCommandCell = props => {
 
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Approvals = () => {
+  const initialFilter = {
+    logic: "and", // or "or"
+    filters: []
+  };
+    const [filter, setFilter] = React.useState(initialFilter);
     const [data, setData] = React.useState([]);
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
@@ -124,6 +131,13 @@ const Approvals = () => {
         setVariant('error')
     }
   }
+  const StatusFilterCell = (props) => (
+    <DropdownFilterCell
+      {...props}
+      data={['APPROVED', 'RECALLED', 'REJECTED', 'PENDING']}
+      defaultItem={"Select Status"}
+    />
+  );
 
   return <React.Fragment>
             <HeaderLayout>
@@ -137,15 +151,21 @@ const Approvals = () => {
             <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
                 <h4>Approvals</h4>
             </div>
-            <Grid data={data}>
+            <Grid
+              data={filterBy(data, filter)}
+              navigatable={true}
+              filterable={true}
+              filter={filter}
+              onFilterChange={(e) => setFilter(e.filter)}
+            >
                 
                 <Column field="new_id" title="ID" />
                 <Column field='name' title='Timesheet Name' />
-                <Column field='start_date' title='Start Date' format="{0:d}"/>
-                <Column field='end_date' title='End Date' format="{0:d}"/>
+                <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
+                <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
                 <Column field='employee_name'  title='Employee Name'/>
-                <Column field='status' title='Status' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} ApproveTimesheet={ApproveTimesheet} AcceptRecall={AcceptRecall}/>} />
+                <Column field='status' title='Status' filterCell={StatusFilterCell}/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} ApproveTimesheet={ApproveTimesheet} AcceptRecall={AcceptRecall}/>} filterable={false}/>
             </Grid>
             
             

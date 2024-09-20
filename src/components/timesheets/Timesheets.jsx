@@ -5,9 +5,11 @@ import {GetRequestHelper} from '../helper/GetRequestHelper'
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddForm from './AddForm';
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
+import { filterBy } from "@progress/kendo-data-query";
+import { DropdownFilterCell } from '../dynamic-compoenents/dropdownFilterCell';
 
 
 
@@ -84,6 +86,11 @@ const EditCommandCell = props => {
 
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Timesheets = () => {
+  const initialFilter = {
+    logic: "and", // or "or"
+    filters: []
+  };
+    const [filter, setFilter] = React.useState(initialFilter);
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [data, setData] = React.useState([]);
     const [openDialog, setOpenDialog] = React.useState(false);
@@ -95,6 +102,14 @@ const Timesheets = () => {
         id: 1
     });
     const navigate = useNavigate();
+
+    const StatusFilterCell = (props) => (
+      <DropdownFilterCell
+        {...props}
+        data={['DRAFT', 'APPROVED', 'RECALLED', 'REJECTED', 'PENDING']}
+        defaultItem={"Select Status"}
+      />
+    );
 
 
   const getListing = async() => {
@@ -254,7 +269,13 @@ const Timesheets = () => {
             <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
                 <h4>Timesheets</h4>
             </div>
-            <Grid data={data}>
+            <Grid
+              data={filterBy(data, filter)}
+              navigatable={true}
+              filterable={true}
+              filter={filter}
+              onFilterChange={(e) => setFilter(e.filter)}
+            >
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
                         Add new
@@ -262,10 +283,10 @@ const Timesheets = () => {
                 </GridToolbar>
                 <Column field="new_id" title="ID" />
                 <Column field='name' title='Timesheet Name' />
-                <Column field='start_date' title='Start Date' format="{0:d}"/>
-                <Column field='end_date' title='End Date' format="{0:d}"/>
-                <Column field='approval' title='Status' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit} recall={recall}/>} />
+                <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
+                <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
+                <Column field='approval' title='Status' filterCell={StatusFilterCell}/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  remove={remove} enterEdit={enterEdit} recall={recall}/>} filterable={false}/>
             </Grid>
             
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}

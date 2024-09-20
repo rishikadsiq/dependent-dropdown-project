@@ -7,8 +7,14 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@progress/kendo-react-buttons';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { TextArea } from '@progress/kendo-react-inputs';
+import { filterBy } from "@progress/kendo-data-query";
 
 const ApprovalTimesheet = () => {
+  const initialFilter = {
+    logic: "and", // or "or"
+    filters: []
+  };
+    const [filter, setFilter] = React.useState(initialFilter);
   const [data, setData] = React.useState([]);
   const [timesheetData, setTimesheetData] = React.useState([]);
  
@@ -81,56 +87,60 @@ const ApprovalTimesheet = () => {
                 <Column field='approval' title='Status' />
             </Grid>
             </div>
-      <Grid
-        data={data}
-      >
-        <Column field="new_id" title="Id" width={"50px"}/>
-        <Column field="client_name" title="Client Name" />
-        <Column field="project_name" title="Project Name" />
-        <Column field="task_name" title="Task Name" />
-        <Column field="mon" title="Mon" />
-        <Column field="tue" title="Tue" />
-        <Column field="wed" title="Wed" />
-        <Column field="thu" title="Thu" />
-        <Column field="fri" title="Fri" />
-        <Column field="sat" title="Sat" />
-        <Column field="sun" title="Sun" />
-      </Grid>
+            <Grid
+              data={filterBy(data, filter)}
+              navigatable={true}
+              filterable={true}
+              filter={filter}
+              onFilterChange={(e) => setFilter(e.filter)}
+            >
+              <Column field="new_id" title="Id" width={"50px"}/>
+              <Column field="client_name" title="Client Name" />
+              <Column field="project_name" title="Project Name" />
+              <Column field="task_name" title="Task Name" />
+              <Column field="mon" title="Mon" />
+              <Column field="tue" title="Tue" />
+              <Column field="wed" title="Wed" />
+              <Column field="thu" title="Thu" />
+              <Column field="fri" title="Fri" />
+              <Column field="sat" title="Sat" />
+              <Column field="sun" title="Sun" />
+            </Grid>
 
-      {(timesheetData[0]?.approval === 'PENDING') && (
-              <div className='mt-3'>
-                <div className='mb-3'>
-                <Form onSubmit={handleRejectSubmit} render={formRenderProps =>
-                  <FormElement>
-                    <fieldset className={'k-form-fieldset'}>
-                      <label>Description</label>
-                      <Field
-                        id={'feedback'}
-                        name={'feedback'}
-                        label={'Feedback *'}
-                        component={TextArea}
-                        validator={requiredValidator}
-                      />
-                      <div className="d-flex justify-content-between align-items-center mt-3">
-                        <Button
-                          themeColor={"error"}
-                          type={"submit"}
-                          disabled={!formRenderProps.allowSubmit}
-                        >
-                          Reject
-                        </Button>
-                        <Button
-                          themeColor={"success"}
-                          onClick={handleApproveTimesheet}
-                        >
-                          Approve
-                        </Button>
-                      </div>
-                    </fieldset>
-                  </FormElement>} />
-              </div>
-              </div>
-            )}
+            {(timesheetData[0]?.approval === 'PENDING') && (
+                    <div className='mt-3'>
+                      <div className='mb-3'>
+                      <Form onSubmit={handleRejectSubmit} render={formRenderProps =>
+                        <FormElement>
+                          <fieldset className={'k-form-fieldset'}>
+                            <label>Description</label>
+                            <Field
+                              id={'feedback'}
+                              name={'feedback'}
+                              label={'Feedback *'}
+                              component={TextArea}
+                              validator={requiredValidator}
+                            />
+                            <div className="d-flex justify-content-between align-items-center mt-3">
+                              <Button
+                                themeColor={"error"}
+                                type={"submit"}
+                                disabled={!formRenderProps.allowSubmit}
+                              >
+                                Reject
+                              </Button>
+                              <Button
+                                themeColor={"success"}
+                                onClick={handleApproveTimesheet}
+                              >
+                                Approve
+                              </Button>
+                            </div>
+                          </fieldset>
+                        </FormElement>} />
+                    </div>
+                    </div>
+                  )}
             <style>
                 {`.k-animation-container {
                     z-index: 10003;

@@ -6,9 +6,10 @@ import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import EditForm from './editForm';
 import AddClient from './AddClient';
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
+import { filterBy } from "@progress/kendo-data-query";
 
 const EditCommandCell = props => {
     return (
@@ -34,6 +35,11 @@ const EditCommandCell = props => {
   
 const MyEditCommandCell = props => <EditCommandCell {...props} enterEdit={props.enterEdit} />;
 const Clients = () => {
+  const initialFilter = {
+    logic: "and", // or "or"
+    filters: []
+  };
+    const [filter, setFilter] = React.useState(initialFilter);
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [openEditForm, setOpenEditForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
@@ -158,7 +164,7 @@ const Clients = () => {
 
                     // Function to find changed properties in the event object compared to orignalData
                     function getChangedData(original, updated) {
-                      const changedData = {};
+                      const changedData = {};  
                       Object.keys(updated).forEach(key => {
                         if (updated[key] !== original[key]) {
                           changedData[key] = updated[key];
@@ -215,7 +221,13 @@ const Clients = () => {
             <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
                 <h4>Clients</h4>
             </div>
-            <Grid data={data}>
+            <Grid
+              data={filterBy(data, filter)}
+              navigatable={true}
+              filterable={true}
+              filter={filter}
+              onFilterChange={(e) => setFilter(e.filter)}
+            >
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
                         Add new
@@ -225,8 +237,8 @@ const Clients = () => {
                 <Column field='name' title='Client Name' />
                 <Column field='email' title='Email' />
                 <Column field='phone' title='Phone' />
-                <Column field='is_active' title='Active' />
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} />
+                <Column field='is_active' title='Active' filter='boolean'/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} filterable={false}/>
             </Grid>
             {openAddForm && <AddClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}

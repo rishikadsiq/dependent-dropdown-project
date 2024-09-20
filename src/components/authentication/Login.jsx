@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Button } from "@progress/kendo-react-buttons";
 import { Container, Card } from 'react-bootstrap';
@@ -12,7 +12,7 @@ import {
   requiredValidator,
   emailValidator,
 } from './validators'
-import Alerts from '../alerts/Alerts';
+import Alerts from '../dynamic-compoenents/Alerts';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,6 +45,7 @@ const Login = () => {
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('userData', JSON.stringify(decoded));
+        localStorage.setItem('login_message', JSON.stringify(response))
         console.log("Navigating to home page...");
         navigate('/');
       } else if (response.status === 401) {
@@ -56,6 +57,16 @@ const Login = () => {
       console.error('Error logging in:', error);
     }
   };
+
+  useEffect(()=> {
+    const thankyou_message = JSON.parse(localStorage.getItem('thankyou_message'));
+    if(thankyou_message){
+      setShowAlert(true)
+      setMessage('Thank you for registering with Timechronos! Your account has been successfully created.')
+      setVariant('success')
+      localStorage.removeItem('thankyou_message')
+    }
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword); // Toggle the showPassword state
