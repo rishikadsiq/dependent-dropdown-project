@@ -176,17 +176,41 @@ const TaskDropDownCell = ({ dataItem, field, onChange, client, project, task, se
 
 
 
+
 const CustomCell = ({ tdProps, children, color }) => {
-  return tdProps ? (
-    <td {...tdProps} style={{ ...tdProps.style, backgroundColor: color }}>
-      {children}
-    </td>
-  ) : null;
+    return tdProps ? (
+        <td {...tdProps} style={{ ...tdProps.style, backgroundColor: color }}>
+            {children}
+        </td>
+    ) : null;
 };
 
-const MyInputCustomCell = props => <CustomCell {...props} color="red" />;
-const MyNumericCustomCell = props => <CustomCell {...props} color="lightgreen" />;
-const MyBooleanCustomCell = props => <CustomCell {...props} color="pink" />;
+const CustomCellNumeric = ({ tdProps, dataItem, field, onChange, color }) => {
+    const handleChange = (event) => {
+        const value = event.value;
+        // Only update if the value is between 0 and 24
+        if (value >= 0 && value <= 24) {
+            onChange({ ...event, dataItem, field });
+        }
+    };
+
+    return tdProps ? (
+        <td {...tdProps} style={{ ...tdProps.style, backgroundColor: color }}>
+            <NumericTextBox
+                value={dataItem[field]}
+                onChange={handleChange}
+                min={0}
+                max={24}
+            />
+            {/* Remove the children if you don't want extra inputs */}
+        </td>
+    ) : null;
+};
+
+const MyInputCustomCell = (props) => <CustomCell {...props} color="red" />;
+const MyNumericCustomCell = (props) => <CustomCellNumeric {...props} color="lightgreen" />;
+const MyBooleanCustomCell = (props) => <CustomCell {...props} color="pink" />;
+
 
 const TaskHour = () => {
   const initialFilter = {
