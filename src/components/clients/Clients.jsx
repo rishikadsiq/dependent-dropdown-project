@@ -17,7 +17,7 @@ const EditCommandCell = props => {
         <Button
           themeColor={'primary'}
           type="button"
-          style={{ marginRight: '10px' }} // Adds space between buttons
+          style={{ marginRight: '5px' }} // Adds space between buttons
           onClick={() => props.enterEdit(props.dataItem)}
         >
           Edit
@@ -25,9 +25,17 @@ const EditCommandCell = props => {
         <Button
           themeColor={'primary'}
           type="button"
+          style={{ marginRight: '5px' }}
           onClick={() => props.remove(props.dataItem)}
         >
           Delete
+        </Button>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() =>props.addProject(props.dataItem)}
+        >
+          Add Project
         </Button>
       </td>
     );
@@ -51,6 +59,8 @@ const Clients = () => {
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
+    const [openDialogConfirmNavigate, setOpenDialogConfirmNavigate] = React.useState(false)
+    const[confirmNavigate, setConfirmNavigate] = React.useState(false)
     const navigate = useNavigate()
 
   const getListing = async() => {
@@ -116,6 +126,11 @@ const Clients = () => {
         setOpenDialog(true);
     };
 
+    const handleAddProject = (dataItem) => {
+      localStorage.setItem('selectedClient', JSON.stringify({'name': dataItem.name, 'id': dataItem.id}))
+      setConfirmNavigate(true)
+    }
+
   const handleSubmit = event => {
     let newItem = true;
     let newData = data.map(item => {
@@ -140,8 +155,9 @@ const Clients = () => {
                     setMessage(data1.message)
                     setShowAlert(true)
                     setVariant("success")
-                    localStorage.setItem('selectedClientRecentlyAdded', JSON.stringify({'name': data1.name, 'id': data1.id}));
-                    navigate('/projects')
+                    localStorage.setItem('selectedClient', JSON.stringify({'name': data1.name, 'id': data1.id}));
+                    setOpenDialogConfirmNavigate(true);
+                    // navigate('/projects')
                 }
                 else if(data1.status === 409 || data1.status === 400){
                     setMessage(data1.message)
@@ -198,10 +214,23 @@ const Clients = () => {
     getListing()
     
   };
+
+
+  React.useEffect(() => {
+    console.log(confirmNavigate)
+    if(confirmNavigate){
+        navigate('/projects');
+    }
+    else if(!confirmNavigate){
+      localStorage.removeItem('selectedClient')
+    }  
+  }, [confirmNavigate])
+
+
   const addNew = () => {
     setOpenAddForm(true);
     setEditItem({
-      id: 99
+      id: undefined
     }); // you need to change the logic for adding unique ID value;
   };
   const handleCancelEdit = () => {
@@ -238,7 +267,7 @@ const Clients = () => {
                 <Column field='email' title='Email' />
                 <Column field='phone' title='Phone' />
                 <Column field='is_active' title='Active' filter='boolean'/>
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} filterable={false}/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove} addProject={handleAddProject}/>} filterable={false}/>
             </Grid>
             {openAddForm && <AddClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
@@ -250,6 +279,30 @@ const Clients = () => {
                     <DialogActionsBar>
                         <Button onClick={onDeleteData}>Delete</Button>
                         <Button onClick={toggleDialog}>Cancel</Button>
+                    </DialogActionsBar>
+                </Dialog>
+            )}
+            {openDialogConfirmNavigate && (
+                <Dialog 
+                  title={"Confirm Navigate"} 
+                  onClose={() => {
+                    localStorage.removeItem('selectedClient')
+                    setOpenDialogConfirmNavigate(false)
+                  }} 
+                  width={350}
+                >
+                    <div>
+                        Are you sure you want to add project for the client you recently added?
+                    </div>
+                    <DialogActionsBar>
+                        <Button onClick={() => {
+                            localStorage.removeItem('selectedClient')
+                            setOpenDialogConfirmNavigate(false)
+                          }}>No</Button>
+                        <Button onClick={() => {
+                          setOpenDialogConfirmNavigate(false)
+                          setConfirmNavigate(true)
+                        }}>Yes</Button>
                     </DialogActionsBar>
                 </Dialog>
             )}

@@ -10,6 +10,7 @@ import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 import { filterBy } from "@progress/kendo-data-query";
+import AddFormFromClient from './AddFormFromClient';
 
 
 const EditCommandCell = props => {
@@ -29,6 +30,13 @@ const EditCommandCell = props => {
           onClick={() => props.remove(props.dataItem)}
         >
           Delete
+        </Button>
+        <Button
+          themeColor={'primary'}
+          type="button"
+          onClick={() =>props.addTask(props.dataItem)}
+        >
+          Add Task
         </Button>
       </td>
     );
@@ -53,9 +61,12 @@ const Projects = () => {
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
     const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
+    const [openAddFormFromClients, setOpenAddFormFromClients] = React.useState(false)
+    const [openDialogConfirmNavigate, setOpenDialogConfirmNavigate] = React.useState(false)
+    const[confirmNavigate, setConfirmNavigate] = React.useState(false)
     const navigate = useNavigate()
 
-
+  
 
 
   const getListing = async() => {
@@ -86,6 +97,21 @@ const Projects = () => {
     getListing(); // Call the function to fetch data
 }, []);
 
+const addNewFromClients = (localdata) => {
+  setEditItem({
+    id: undefined,
+    client_id: localdata.id,
+    client_name: localdata.name,
+  });
+}
+React.useEffect(() => {
+  const localdata = JSON.parse(localStorage.getItem('selectedClient'))
+  if(localdata){
+    addNewFromClients(localdata)
+    setOpenAddFormFromClients(true)
+    localStorage.removeItem('selectedClient')
+  }
+},[])
 
   const enterEdit = item => {
     setOpenEditForm(true);
@@ -124,6 +150,11 @@ const Projects = () => {
         setOpenDialog(true);
     };
 
+    const handleAddTask = (dataItem) => {
+      localStorage.setItem('selectedProject', JSON.stringify({'name': dataItem.name, 'id': dataItem.id}))
+      setConfirmNavigate(true)
+    }
+
   const handleSubmit = event => {
     let newItem = true;
     let newData = data.map(item => {
@@ -141,7 +172,13 @@ const Projects = () => {
             try {
                 delete event.id
                 console.log(event);
-                const updatedEvent = {...event, client_id: event.client_id.id}
+                let updatedEvent = {}
+                if(event.client_id.id){
+                   updatedEvent = {...event, client_id: event.client_id.id}
+                }else if(event.client_id){
+                    updatedEvent = {...event}
+                }
+                  
                 console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 
@@ -151,6 +188,8 @@ const Projects = () => {
                     setShowAlert(true)
                     setVariant("success")
                     localStorage.removeItem('to_be_add');
+                    localStorage.setItem('selectedProject', JSON.stringify({'name': data1.name, 'id': data1.id}));
+                    setOpenDialogConfirmNavigate(true);
                 }
                 else if(data1.status === 409 ){
                     setShowDuplicateDialog(true)
@@ -168,6 +207,7 @@ const Projects = () => {
         }
         fetchData(); // Call the function to fetch data
         setOpenAddForm(false)
+        setOpenAddFormFromClients(false)
     } else {
         const fetchData = async() => {
             try {
@@ -214,6 +254,18 @@ const Projects = () => {
     }
     getListing()
   };
+
+  React.useEffect(() => {
+    console.log(confirmNavigate)
+    if(confirmNavigate){
+        navigate('/tasks');
+    }
+    else if(!confirmNavigate){
+      localStorage.removeItem('selectedProject')
+    }
+    
+  }, [confirmNavigate])
+
   const addNew = () => {
     setOpenAddForm(true);
     setEditItem({
@@ -223,6 +275,7 @@ const Projects = () => {
   const handleCancelEdit = () => {
     setOpenEditForm(false);
     setOpenAddForm(false);
+    setOpenAddFormFromClients(false);
   };
 
   const toggleDuplicateDialog = () => {
@@ -237,15 +290,18 @@ const Projects = () => {
                 const parsedData = JSON.parse(toBeAdded)
                 const response = await PostRequestHelper('addduplicateproject', parsedData, navigate)
                 console.log(response)
-                if(response.status === 200) {
+                if(response.status === 201) {
                     setMessage(response.message)
                         setShowAlert(true)
                         setVariant("success")
                         localStorage.removeItem('to_be_add');
+                        localStorage.setItem('selectedProject', JSON.stringify({'name': response.name, 'id': response.id}));
+                        setOpenDialogConfirmNavigate(true);
                 }
                 getListing();
             }
         }catch(e){
+            localStorage.removeItem('to_be_add');
             console.error('Error adding duplicate data:', e);
         }
     }
@@ -304,8 +360,9 @@ const Projects = () => {
                 <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
                 <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
                 <Column field='is_active' title='Active' filter='boolean'/>
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} filterable={false}/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove} addTask={handleAddTask}/>} filterable={false}/>
             </Grid>
+            {openAddFormFromClients && <AddFormFromClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (
@@ -316,6 +373,31 @@ const Projects = () => {
                     <DialogActionsBar>
                         <Button onClick={onDeleteData}>Delete</Button>
                         <Button onClick={toggleDialog}>Cancel</Button>
+                    </DialogActionsBar>
+                </Dialog>
+            )}
+
+            {openDialogConfirmNavigate && (
+                <Dialog 
+                  title={"Confirm Navigate"} 
+                  onClose={() => {
+                    localStorage.removeItem('selectedProject')
+                    setOpenDialogConfirmNavigate(false)
+                  }} 
+                  width={350}
+                >
+                    <div>
+                        Are you sure you want to add project for the client you recently added?
+                    </div>
+                    <DialogActionsBar>
+                        <Button onClick={() => {
+                            localStorage.removeItem('selectedProject')
+                            setOpenDialogConfirmNavigate(false)
+                          }}>No</Button>
+                        <Button onClick={() => {
+                          setOpenDialogConfirmNavigate(false)
+                          setConfirmNavigate(true)
+                        }}>Yes</Button>
                     </DialogActionsBar>
                 </Dialog>
             )}

@@ -10,6 +10,7 @@ import Alerts from '../dynamic-compoenents/Alerts';
 import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 import { filterBy } from "@progress/kendo-data-query";
+import AddFormFromProject from "./AddFormFromProject"
 
 
 const EditCommandCell = props => {
@@ -53,6 +54,7 @@ const Tasks = () => {
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
     const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
+    const [openAddFormFromProjects, setopenAddFormFromProjects] = React.useState(false)
     const navigate = useNavigate()
 
 
@@ -84,6 +86,23 @@ const Tasks = () => {
   React.useEffect(() => {
     getListing(); // Call the function to fetch data
 }, []);
+
+const addNewFromProjects = (localdata) => {
+  setEditItem({
+    id: undefined,
+    project_id: localdata.id,
+    project_name: localdata.name,
+  });
+}
+
+  React.useEffect(() => {
+    const localdata = JSON.parse(localStorage.getItem('selectedProject'))
+    if(localdata){
+      addNewFromProjects(localdata)
+      setopenAddFormFromProjects(true)
+      localStorage.removeItem('selectedProject')
+    }
+  },[])
 
 
   const enterEdit = item => {
@@ -140,7 +159,13 @@ const Tasks = () => {
             try {
                 delete event.id
                 console.log(event);
-                const updatedEvent = {...event, project_id: event.project_id.id}
+                let updatedEvent = {}
+                if(event.project_id.id){
+                   updatedEvent = {...event, project_id: event.project_id.id}
+                }else if(event.project_id){
+                    updatedEvent = {...event}
+                }
+                
                 console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 const data1 = await PostRequestHelper('addtask', updatedEvent, navigate);
@@ -166,6 +191,7 @@ const Tasks = () => {
         }
         fetchData(); // Call the function to fetch data
         setOpenAddForm(false)
+        setopenAddFormFromProjects(false)
     } else {
         const fetchData = async() => {
             try {
@@ -221,6 +247,7 @@ const Tasks = () => {
   const handleCancelEdit = () => {
     setOpenEditForm(false);
     setOpenAddForm(false);
+    setopenAddFormFromProjects(false); 
   };
 
 
@@ -306,6 +333,7 @@ const Tasks = () => {
                 <Column field='is_active' title='Active' filter='boolean'/>
                 <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove}/>} filterable={false}/>
             </Grid>
+            {openAddFormFromProjects && <AddFormFromProject cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialog && (

@@ -232,6 +232,8 @@ const TaskHour = () => {
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
   const [showCard, setShowCard] = React.useState(false)
+  const [sums, setSums] = React.useState({});
+  const [disabled, setDisabled] = React.useState(true)
 
   const { timesheetId } = useParams();
   const navigate = useNavigate();
@@ -240,6 +242,8 @@ const TaskHour = () => {
     const response = await GetRequestHelper('metadata', navigate);
     return response.message;
   };
+
+
 
   React.useEffect(() => {
     const getMetadata = async () => {
@@ -295,8 +299,29 @@ const TaskHour = () => {
   };
 
   React.useEffect(() => {
+    const initialSums = { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0, sun: 0 };
+
+    const newSums = data.reduce((acc, item) => {
+      acc.mon += item.mon || 0;
+      acc.tue += item.tue || 0;
+      acc.wed += item.wed || 0;
+      acc.thu += item.thu || 0;
+      acc.fri += item.fri || 0;
+      acc.sat += item.sat || 0;
+      acc.sun += item.sun || 0;
+      return acc;
+    }, initialSums);
+
+    setSums(newSums);
+  },[data])
+
+  React.useEffect(() => {
+    const handleApprovalButton = Object.values(sums).every(day => day >= 8);
+    setDisabled(!handleApprovalButton);
+  }, [data]);
+
+  React.useEffect(() => {
     getListing();
-    
   }, []);
 
   const enterInsert = () => {
@@ -675,27 +700,16 @@ const TaskHour = () => {
       {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <div className='mt-3'>
             <div className='mb-3'>
-            <Form onSubmit={handleApprovalSubmit} render={formRenderProps =>
-              <FormElement>
-                <fieldset className={'k-form-fieldset'}>
-                  <label>Description</label>
-                  <Field
-                    id={'description'}
-                    name={'description'}
-                    label={'Description'}
-                    component={TextArea}
-                  />
+            
                    <div className="d-flex justify-content-between align-items-center mt-3">
                     <Button
                       themeColor={"primary"}
-                      type={"submit"}
-                      disabled={!formRenderProps.allowSubmit}
+                      onClick={handleApprovalSubmit}
+                      disabled={disabled}
                     >
                       Send for Approval
                     </Button>
                   </div>
-                </fieldset>
-              </FormElement>} />
           </div>
           </div>
         )}
