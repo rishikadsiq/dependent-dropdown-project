@@ -556,7 +556,17 @@ const TaskHour = () => {
     );
   };
   
-  
+  const allInEdit =() => {
+    const updatedData =  data.map((item) =>
+      Object.assign(
+        {
+          inEdit: true,
+        },
+        item
+      )
+    );
+    setData(updatedData)
+  }
 
   const handleApprovalSubmit = async(dataItem) => {
     try {
@@ -628,6 +638,9 @@ const TaskHour = () => {
           <GridToolbar>
             <Button title="Add new" type="button" onClick={enterInsert}>
               Add new
+            </Button>
+            <Button title="Edit" type="button" onClick={allInEdit}>
+              Edit
             </Button>
           </GridToolbar>
         )}
