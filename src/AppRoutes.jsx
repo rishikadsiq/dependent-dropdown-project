@@ -12,6 +12,7 @@ import ForgotPassword from './components/authentication/ForgotPassword';
 import Approvals from './components/approvals/Approvals';
 import ApprovalTimesheet from './components/approvals/ApprovalTimesheet';
 import ResetPassword from './components/authentication/ResetPassword';
+import Profile from './components/users/Profile';
 
 const AppRoutes = () => (
     <Router>
@@ -36,7 +37,7 @@ const AppRoutes = () => (
             <Route path='/approvals' element={<Approvals />} />
             <Route path='/approval/:timesheetId' element={<ApprovalTimesheet />} />
 
-            {/* <Route path='/profile' element={<Profile />} /> */}
+            <Route path='/profile' element={<Profile />} />
             {/* <Route path='/compress' element={<Compression />} /> */}
         </Routes>
     </Router>
