@@ -35,6 +35,7 @@ const GuideMeClient = ({setProjectComponent, setClientComponent}) => {
   const navigate = useNavigate()
 
   const addNew = () => {
+    localStorage.removeItem('selectedClient')
     setOpenAddSuccessDialog(false)
     setOpenAddForm(true);
     setEditItem({
@@ -109,6 +110,7 @@ const GuideMeClient = ({setProjectComponent, setClientComponent}) => {
   }
 
   const handleCancelEdit = () => {
+    localStorage.removeItem('selectedClient')
     setOpenAddForm(false);
   }
 
