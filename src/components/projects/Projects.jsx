@@ -11,6 +11,7 @@ import HeaderLayout from '../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 import { filterBy } from "@progress/kendo-data-query";
 import AddFormFromClient from './AddFormFromClient';
+import { DropdownFilterCell } from '../dynamic-compoenents/dropdownFilterCell';
 
 
 const EditCommandCell = props => {
@@ -48,7 +49,11 @@ const Projects = () => {
         logic: "and", // or "or"
         filters: []
       };
-        const [filter, setFilter] = React.useState(initialFilter);
+    const initialDataState = {
+      skip: 0,
+      take: 10,
+    };
+    const [filter, setFilter] = React.useState(initialFilter);
     const [openEditForm, setOpenEditForm] = React.useState(false);
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
@@ -64,10 +69,30 @@ const Projects = () => {
     const [openAddFormFromClients, setOpenAddFormFromClients] = React.useState(false)
     const [openDialogConfirmNavigate, setOpenDialogConfirmNavigate] = React.useState(false)
     const[confirmNavigate, setConfirmNavigate] = React.useState(false)
+    const [page, setPage] = React.useState(initialDataState);
+    const [pageSizeValue, setPageSizeValue] = React.useState();
+    const pageChange = (event) => {
+      const targetEvent = event.targetEvent;
+      const take =
+        targetEvent.value === "All" ? data.length : event.page.take;
+      if (targetEvent.value) {
+        setPageSizeValue(targetEvent.value);
+      }
+      setPage({
+        ...event.page,
+        take,
+      });
+    };
     const navigate = useNavigate()
 
   
-
+    const ClientFilterCell = (props) => (
+      <DropdownFilterCell
+        {...props}
+        data={[...new Set(data.map(item => item.client_name))]}
+        defaultItem={"Select Client"}
+      />
+    );
 
   const getListing = async() => {
     try {
@@ -343,7 +368,16 @@ React.useEffect(() => {
                 </Dialog>
             )}
             <Grid
-              data={filterBy(data, filter)}
+               data={filterBy(data, filter).slice(page.skip, page.take + page.skip)}
+               skip={page.skip}
+               take={page.take}
+               total={data.length}
+               pageable={{
+                 buttonCount: 4,
+                 pageSizes: [5, 10, 15, "All"],
+                 pageSizeValue: pageSizeValue,
+               }}
+               onPageChange={pageChange}
               navigatable={true}
               filterable={true}
               filter={filter}
@@ -356,7 +390,7 @@ React.useEffect(() => {
                 </GridToolbar>
                 <Column field="new_id" title="ID" />
                 <Column field='name' title='Project Name' />
-                <Column field='client_name' title='Client Name' />
+                <Column field='client_name' title='Client Name' filterCell={ClientFilterCell}/>
                 <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
                 <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
                 <Column field='is_active' title='Active' filter='boolean'/>
@@ -387,7 +421,7 @@ React.useEffect(() => {
                   width={350}
                 >
                     <div>
-                        Are you sure you want to add project for the client you recently added?
+                        Are you sure you want to add task for the project you recently added?
                     </div>
                     <DialogActionsBar>
                         <Button onClick={() => {

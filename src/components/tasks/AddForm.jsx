@@ -8,7 +8,7 @@ import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { useNavigate } from "react-router-dom";
 
-const EditForm = (props) => {
+const AddForm = (props) => {
   const [projectData, setProjectData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate()
@@ -119,4 +119,4 @@ const EditForm = (props) => {
   );
 };
 
-export default EditForm;
+export default AddForm;

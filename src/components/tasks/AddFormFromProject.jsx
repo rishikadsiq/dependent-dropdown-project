@@ -88,7 +88,7 @@ const AddFormFromProject = (props) => {
   
 
   return (
-    <Dialog title={`Task Project`} onClose={props.cancelEdit}>
+    <Dialog title={`Add Task`} onClose={props.cancelEdit}>
       <Form
         onSubmit={props.onSubmit}
         initialValues={{ project_id: props.item.project_id, ...props.item }}

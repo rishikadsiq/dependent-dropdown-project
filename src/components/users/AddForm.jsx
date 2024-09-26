@@ -7,6 +7,8 @@ import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { RadioGroup } from "@progress/kendo-react-inputs";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const genderData = [
   { label: 'Female', value: 'female' },
@@ -14,14 +16,16 @@ const genderData = [
   { label: 'Other', value: 'other' }
 ];
 
-const EditForm = (props) => {
+const AddForm = (props) => {
   const [userData, setUserData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate()
 
 
   // Validator function to ensure required fields are filled
   const requiredValidator = (value) => (value ? "" : "Error: This field is required.");
+  const passwordValidator = value => value && value.length > 8 ? '' : 'Password must be at least 8 symbols.';
 
   // Fetch client and user metadata
   const getMetaData = async () => {
@@ -57,9 +61,13 @@ const EditForm = (props) => {
       </div>
     );
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   
   return (
-    <Dialog title={`Add Task`} onClose={props.cancelEdit}>
+    <Dialog title={`Add User`} onClose={props.cancelEdit}>
       <Form
         onSubmit={props.onSubmit}
         initialValues={{ ...props.item }}
@@ -138,13 +146,29 @@ const EditForm = (props) => {
                   />
                 )}
               </div>
-              <div className="mb-3">
-                <Field
-                  name={"password"}
-                  component={Input}
-                  label={"Password *"}
-                />
-              </div>
+              <div className="position-relative">
+                    <Field
+                      id={'password'}
+                      name={'password'}
+                      label={'Password *'}
+                      type={showPassword ? 'text' : 'password'}
+                      component={Input}
+                      validator={passwordValidator}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-link position-absolute"
+                      onClick={togglePasswordVisibility}
+                      style={{
+                        top: '50%',
+                        right: '5px',  // Adjusted for better right alignment
+                        transform: 'translateY(-20%)',
+                        padding: 0,
+                      }}
+                    >
+                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    </button>
+                  </div>
             </fieldset>
             <div className="k-form-buttons">
               <Button disabled={!formRenderProps.allowSubmit} themeColor={"primary"}>
@@ -161,4 +185,4 @@ const EditForm = (props) => {
   );
 };
 
-export default EditForm;
+export default AddForm;

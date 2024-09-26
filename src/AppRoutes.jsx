@@ -7,13 +7,16 @@ import Timesheets from './components/timesheets/Timesheets';
 import Signup from './components/authentication/Signup';
 import Login from './components/authentication/Login';
 import Home from './components/home/Home';
-import TaskHour from './components/taskhours/TaskHour'
+// import TaskHour from './components/taskhours/TaskHour'
 import ForgotPassword from './components/authentication/ForgotPassword';
 import Approvals from './components/approvals/Approvals';
 import ApprovalTimesheet from './components/approvals/ApprovalTimesheet';
 import ResetPassword from './components/authentication/ResetPassword';
 import Profile from './components/users/Profile';
 import GuideMe from './components/guide-me/GuideMe';
+import TaskHoursRefactor from './components/taskhours/TaskHoursRefactor';
+
+
 const AppRoutes = () => (
     <Router>
         <Routes>
@@ -33,7 +36,7 @@ const AppRoutes = () => (
             <Route path='/tasks' element={<Tasks />} />
             <Route path='/timesheets' element={<Timesheets />} />
             <Route path='/users' element={<Users />} />
-            <Route path='/timesheet/:timesheetId' element={<TaskHour />} />
+            <Route path='/timesheet/:timesheetId' element={<TaskHoursRefactor />} />
             <Route path='/approvals' element={<Approvals />} />
             <Route path='/approval/:timesheetId' element={<ApprovalTimesheet />} />
             <Route path='/guide-me' element={<GuideMe />} />

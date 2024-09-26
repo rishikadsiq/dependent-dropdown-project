@@ -57,12 +57,30 @@ const Approvals = () => {
     logic: "and", // or "or"
     filters: []
   };
+  const initialDataState = {
+    skip: 0,
+    take: 10,
+  };
     const [filter, setFilter] = React.useState(initialFilter);
     const [data, setData] = React.useState([]);
     const [showAlert, setShowAlert] = React.useState(false)
     const [message, setMessage] = React.useState("")
     const [variant, setVariant] = React.useState(null)
-    
+    const [page, setPage] = React.useState(initialDataState);
+    const [pageSizeValue, setPageSizeValue] = React.useState();
+    const pageChange = (event) => {
+      const targetEvent = event.targetEvent;
+      const take =
+        targetEvent.value === "All" ? data.length : event.page.take;
+      if (targetEvent.value) {
+        setPageSizeValue(targetEvent.value);
+      }
+      setPage({
+        ...event.page,
+        take,
+      });
+    };
+      
     const navigate = useNavigate();
     
 
@@ -152,7 +170,16 @@ const Approvals = () => {
                 <h4>Approvals</h4>
             </div>
             <Grid
-              data={filterBy(data, filter)}
+              data={filterBy(data, filter).slice(page.skip, page.take + page.skip)}
+              skip={page.skip}
+              take={page.take}
+              total={data.length}
+              pageable={{
+                buttonCount: 4,
+                pageSizes: [5, 10, 15, "All"],
+                pageSizeValue: pageSizeValue,
+              }}
+              onPageChange={pageChange}
               navigatable={true}
               filterable={true}
               filter={filter}
