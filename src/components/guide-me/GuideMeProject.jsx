@@ -3,9 +3,9 @@ import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-g
 import { Button } from "@progress/kendo-react-buttons";
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import AddForm from './AddForm';
+import AddFormProject from './AddFormProject';
 import { useNavigate } from "react-router-dom";
-import AddFormFromClient from './AddFormFromClient';
+import AddFormProjectFromClient from './AddFormProjectFromClient';
 
 
 const EditCommandCell = props => {
@@ -29,8 +29,6 @@ const Projects = () => {
         id: 1
     });
     const [data, setData] = React.useState([]);
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const [selectedItem, setSelectedItem] = React.useState(null);
     const [showDuplicateDialog, setShowDuplicateDialog] = React.useState(false)
     const [openAddFormFromClients, setOpenAddFormFromClients] = React.useState(false)
     const [openDialogConfirmNavigate, setOpenDialogConfirmNavigate] = React.useState(false)
@@ -78,11 +76,6 @@ React.useEffect(() => {
 },[])
 
     
-  
-
-    const toggleDialog = () => {
-        setOpenDialog(false);
-    };
 
 
     const handleAddTask = (dataItem) => {
@@ -135,9 +128,6 @@ React.useEffect(() => {
                     setShowDuplicateDialog(true)
                 }
                 else if(data1.status === 400 ){
-                    setMessage(data1.message)
-                    setShowAlert(true)
-                    setVariant("danger")
                     localStorage.removeItem('to_be_add');
                 }
                 console.log(data1);
@@ -170,7 +160,6 @@ React.useEffect(() => {
     }); // you need to change the logic for adding unique ID value;
   };
   const handleCancelEdit = () => {
-    setOpenEditForm(false);
     setOpenAddForm(false);
     setOpenAddFormFromClients(false);
   };
@@ -207,15 +196,9 @@ React.useEffect(() => {
     
   }
   return <React.Fragment>
-            <HeaderLayout>
-            {showAlert && (
-                <div className='container'>
-                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
-                </div>
-            )}
             
             {/* Main content with header and grid */}
-            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+            <div className='mt-3 mb-3'>
                 <h4>Projects</h4>
             </div>
 
@@ -240,20 +223,7 @@ React.useEffect(() => {
                 </Dialog>
             )}
             <Grid
-               data={filterBy(data, filter).slice(page.skip, page.take + page.skip)}
-               skip={page.skip}
-               take={page.take}
-               total={data.length}
-               pageable={{
-                 buttonCount: 4,
-                 pageSizes: [5, 10, 15, "All"],
-                 pageSizeValue: pageSizeValue,
-               }}
-               onPageChange={pageChange}
-              navigatable={true}
-              filterable={true}
-              filter={filter}
-              onFilterChange={(e) => setFilter(e.filter)}
+               data={data}
             >
                 <GridToolbar>
                     <Button title="Add new" type="button" themeColor={'primary'} onClick={addNew}>
@@ -262,27 +232,14 @@ React.useEffect(() => {
                 </GridToolbar>
                 <Column field="new_id" title="ID" />
                 <Column field='name' title='Project Name' />
-                <Column field='client_name' title='Client Name' filterCell={ClientFilterCell}/>
-                <Column field='start_date' title='Start Date' format="{0:d}" filter="date"/>
-                <Column field='end_date' title='End Date' format="{0:d}" filter="date"/>
+                <Column field='client_name' title='Client Name'/>
+                <Column field='start_date' title='Start Date' format="{0:d}" />
+                <Column field='end_date' title='End Date' format="{0:d}" />
                 <Column field='is_active' title='Active' filter='boolean'/>
-                <Column title='Actions' cell={props => <MyEditCommandCell {...props} enterEdit={enterEdit} remove={remove} addTask={handleAddTask}/>} filterable={false}/>
+                <Column title='Actions' cell={props => <MyEditCommandCell {...props}  addTask={handleAddTask}/>} />
             </Grid>
-            {openAddFormFromClients && <AddFormFromClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
-            {openEditForm && <EditForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
-            {openAddForm && <AddForm cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
-            {openDialog && (
-                <Dialog title={"Delete Project"} onClose={toggleDialog} width={350}>
-                    <div>
-                        Are you sure you want to delete the project {selectedItem?.name} with ID {selectedItem?.id}?
-                    </div>
-                    <DialogActionsBar>
-                        <Button onClick={onDeleteData}>Delete</Button>
-                        <Button onClick={toggleDialog}>Cancel</Button>
-                    </DialogActionsBar>
-                </Dialog>
-            )}
-
+            {openAddFormFromClients && <AddFormProjectFromClient cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}   
+            {openAddForm && <AddFormProject cancelEdit={handleCancelEdit} onSubmit={handleSubmit} item={editItem} />}
             {openDialogConfirmNavigate && (
                 <Dialog 
                   title={"Confirm Navigate"} 
@@ -313,7 +270,6 @@ React.useEffect(() => {
                     z-index: 10003;
                 }`}
             </style>
-            </HeaderLayout>
         </React.Fragment>;
 };
 export default Projects;
