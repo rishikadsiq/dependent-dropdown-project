@@ -38,6 +38,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     });
 
     const tokenData = await tokenRefreshResponse.json();
+    console.log(tokenData)
 
     if (tokenRefreshResponse.ok) {
       // Save the new access token to localStorage

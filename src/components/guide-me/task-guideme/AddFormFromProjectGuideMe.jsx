@@ -4,32 +4,31 @@ import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
-import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { useNavigate } from "react-router-dom";
 
 
-const AddFormProjectFromClient = (props) => {
-  const [clientData, setClientData] = React.useState([]);
+const AddFormFromProjectGuideMe = (props) => {
+  const [projectData, setProjectData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate()
+
 
   const requiredValidator = (value) =>
     value ? "" : "Error: This field is required.";
 
   const getMetaData = async () => {
     try {
-      const localData = JSON.parse(localStorage.getItem('guideMeClientData'));
-      if (localData) {
-        const updatedData = localData.map(client => {
+      const localData = JSON.parse(localStorage.getItem('guideMeProjectData'));
+      console.log(localData)
+      if(localData){
+        const updatedData = localData.map(project => {
           return {
-            client_id: client.id,
-            client_name: client.name,
+            project_id: project.id,
+            project_name: project.name, // Change this line
           };
         });
-        
-        console.log(updatedData)
-        setClientData(updatedData);
+        setProjectData(updatedData);
       }
     } catch (err) {
       console.error("Error fetching metadata:", err);
@@ -59,10 +58,10 @@ const AddFormProjectFromClient = (props) => {
   );
 
   
-  const ClientDropDown = (fieldRenderProps) => {
-    // Find the initial client based on the client_id in initialValues
-    const selectedClient = clientData.find(
-      (client) => client.client_id === fieldRenderProps.value
+  const ProjectDropDown = (fieldRenderProps) => {
+    // Find the initial project based on the project_id in initialValues
+    const selectedProject = projectData.find(
+      (project) => project.project_id === fieldRenderProps.value
     );
   
     return (
@@ -70,10 +69,10 @@ const AddFormProjectFromClient = (props) => {
         <label className="k-label">{fieldRenderProps.label}</label>
         <DropDownList
           data={fieldRenderProps.data}
-          textField="client_name"
-          dataItemKey="client_id"
-          value={selectedClient || null} // Set the selected value
-          onChange={(e) => fieldRenderProps.onChange({ value: e.value.client_id })}
+          textField="project_name"
+          dataItemKey="project_id"
+          value={selectedProject || null} // Set the selected value
+          onChange={(e) => fieldRenderProps.onChange({ value: e.value.project_id })}
           name={fieldRenderProps.name}
         />
         {fieldRenderProps.visited && fieldRenderProps.error && (
@@ -85,10 +84,10 @@ const AddFormProjectFromClient = (props) => {
   
 
   return (
-    <Dialog title={`Add Project`} onClose={props.cancelEdit}>
+    <Dialog title={`Add Task`} onClose={props.cancelEdit}>
       <Form
         onSubmit={props.onSubmit}
-        initialValues={{ client_id: props.item.client_id, ...props.item }}
+        initialValues={{ project_id: props.item.project_id, ...props.item }}
 
         render={(formRenderProps) => (
           <FormElement style={{ maxWidth: 650 }}>
@@ -97,17 +96,17 @@ const AddFormProjectFromClient = (props) => {
                 <Field
                   name={"name"}
                   component={Input}
-                  label={"Project Name *"}
+                  label={"Task Name *"}
                   validator={requiredValidator}
                 />
               </div>
               <div className="mb-3">
                 {!loading && (
                   <Field
-                    name={"client_id"} // Change to client_id
-                    label={"Client Name *"}
-                    component={ClientDropDown}
-                    data={clientData}
+                    name={"project_id"} // Change to project_id
+                    label={"Project Name *"}
+                    component={ProjectDropDown}
+                    data={projectData}
                     validator={requiredValidator}
                   />
                 )}
@@ -147,4 +146,4 @@ const AddFormProjectFromClient = (props) => {
   );
 };
 
-export default AddFormProjectFromClient;
+export default AddFormFromProjectGuideMe;

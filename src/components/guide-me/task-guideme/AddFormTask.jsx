@@ -4,23 +4,32 @@ import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
-import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { useNavigate } from "react-router-dom";
 
-const AddFormProject = (props) => {
-  const [clientData, setClientData] = React.useState([]);
+const AddFormTask = (props) => {
+  const [projectData, setProjectData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate()
 
-  const requiredValidator = (value) =>
-    value ? "" : "Error: This field is required.";
 
+  // Validator function to ensure required fields are filled
+  const requiredValidator = (value) => (value ? "" : "Error: This field is required.");
+
+  // Fetch client and project metadata
   const getMetaData = async () => {
     try {
-      const localData = JSON.parse(localStorage.getItem('guideMeClientData'));
-      if (localData) {
-        setClientData(localData);
+      const localData = JSON.parse(localStorage.getItem('guideMeProjectData'));
+      console.log(localData)
+      if(localData){
+        const updatedData = localData.map(project => {
+          return {
+            project_id: project.id,
+            project_name: project.name, // Change this line
+          };
+        });
+        console.log(updatedData)
+        setProjectData(updatedData);
       }
     } catch (err) {
       console.error("Error fetching metadata:", err);
@@ -33,7 +42,7 @@ const AddFormProject = (props) => {
     getMetaData();
   }, []);
 
-  // Custom rendering function for the DatePicker component
+  // Custom rendering function for DatePicker component
   const DatePickerField = (fieldRenderProps) => (
     <div>
       <label className="k-label">{fieldRenderProps.label}</label>
@@ -41,7 +50,7 @@ const AddFormProject = (props) => {
         value={fieldRenderProps.value}
         onChange={(e) => fieldRenderProps.onChange({ value: e.value })}
         name={fieldRenderProps.name}
-        format="dd/MM/yyyy" // Set format for date display
+        format="dd/MM/yyyy"
       />
       {fieldRenderProps.visited && fieldRenderProps.error && (
         <div className="k-required">{fieldRenderProps.error}</div>
@@ -49,11 +58,15 @@ const AddFormProject = (props) => {
     </div>
   );
 
+ 
+
+  
+
   return (
-    <Dialog title={`Add Project`} onClose={props.cancelEdit}>
+    <Dialog title={`Add Task`} onClose={props.cancelEdit}>
       <Form
         onSubmit={props.onSubmit}
-        initialValues={props.item}
+        initialValues={{ client_id: null, project_id: null, ...props.item }}
         render={(formRenderProps) => (
           <FormElement style={{ maxWidth: 650 }}>
             <fieldset className={"k-form-fieldset"}>
@@ -61,19 +74,20 @@ const AddFormProject = (props) => {
                 <Field
                   name={"name"}
                   component={Input}
-                  label={"Project Name"}
+                  label={"Task Name *"}
                   validator={requiredValidator}
                 />
               </div>
+              
               <div className="mb-3">
                 {!loading && (
                   <Field
-                    name={"client_id"}
+                    name={"project_id"}
                     component={DropDownList}
-                    data={clientData}
-                    textField="name"
-                    dataItemKey="client_id"
-                    label="Client Name"
+                    data={projectData}
+                    textField="project_name"
+                    dataItemKey="project_id"
+                    label="Project Name *"
                     validator={requiredValidator}
                   />
                 )}
@@ -82,22 +96,21 @@ const AddFormProject = (props) => {
                 <Field
                   name={"start_date"}
                   label={"Start Date"}
-                  component={DatePickerField} // Use custom DatePickerField renderer
+                  component={DatePickerField}
                 />
               </div>
               <div className="mb-3">
                 <Field
                   name={"end_date"}
                   label={"End Date"}
-                  component={DatePickerField} 
+                  component={DatePickerField}
                 />
               </div>
+              
+              
             </fieldset>
             <div className="k-form-buttons">
-              <Button
-                disabled={!formRenderProps.allowSubmit}
-                themeColor={"primary"}
-              >
+              <Button disabled={!formRenderProps.allowSubmit} themeColor={"primary"}>
                 Add
               </Button>
               <Button type={"button"} onClick={props.cancelEdit}>
@@ -111,4 +124,4 @@ const AddFormProject = (props) => {
   );
 };
 
-export default AddFormProject;
+export default AddFormTask;
