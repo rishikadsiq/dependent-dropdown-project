@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { AutoComplete, DropDownList } from '@progress/kendo-react-dropdowns';
+import { DropDownList } from '@progress/kendo-react-dropdowns';
 import {GetRequestHelper} from  '../helper/GetRequestHelper'
 import {PostRequestHelper} from  '../helper/PostRequestHelper'
 import { useNavigate } from 'react-router-dom';
@@ -9,171 +9,9 @@ import HeaderLayout from '../home/HeaderLayout'
 import { useParams } from 'react-router-dom';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import Alerts from '../dynamic-compoenents/Alerts';
-import { TextArea } from '@progress/kendo-react-inputs';
-import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import CardComponent from './CardComponent';
-import { filterBy } from "@progress/kendo-data-query";
-import { RangeFilterCell } from "../dynamic-compoenents/rangeFilterCell";
 import { NumericTextBox } from '@progress/kendo-react-inputs';
-
-
-
-const numericValidator = (value) => {
-  return value <= 24 ? "" : "The value must be less than or equal to 24";
-};
-
-const DropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataClients }) => {
-  const [value, setValue] = React.useState(client ? dataClients.find(c => c.value === client)?.text : ''); // Track typed value
-
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
-    setValue(selectedValue); // Update local input value
-    
-    // Find the corresponding client object based on input
-    const selectedClient = dataClients.find(c => c.text === selectedValue);
-
-    if (onChange && selectedClient) {
-      onChange({
-        dataIndex: 0,
-        dataItem: dataItem,
-        field: field,
-        syntheticEvent: e.syntheticEvent,
-        value: selectedClient.value
-      });
-    }
-
-    if (selectedClient) {
-      setClient(selectedClient.value);
-      setProject(null);  // Reset project and task when client changes
-      setTask(null);
-    }
-  };
-
-  const dataValue = dataItem[field] === null ? '' : dataItem[field];
-
-  return (
-    <td>
-      {dataItem.inEdit ? (
-        <AutoComplete
-          style={{ width: '100px' }}
-          onChange={handleChange}
-          value={value} // The value now reflects the typed input
-          data={dataClients}
-          textField="text" // Specifies which field to display as the text
-          dataItemKey="value" // Specifies the key used to identify each item
-          placeholder="Type to search client..." // Optional placeholder
-        />
-      ) : dataValue == null ? (
-        ''
-      ) : (
-        dataClients.find(c => c.value === dataValue)?.text || dataValue
-      )}
-    </td>
-  );
-};
-
-const ProjectDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataProjects }) => {
-  const [value, setValue] = React.useState(project ? dataProjects.find(p => p.value === project)?.text : ''); // Track typed value
-
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
-    setValue(selectedValue); // Update local input value
-
-    // Find the corresponding project object based on input
-    const selectedProject = dataProjects.find(p => p.text === selectedValue);
-
-    if (onChange && selectedProject) {
-      onChange({
-        dataIndex: 0,
-        dataItem,
-        field,
-        syntheticEvent: e.syntheticEvent,
-        value: selectedProject.value
-      });
-    }
-
-    if (selectedProject) {
-      setProject(selectedProject.value);
-      setClient(selectedProject.client_id);  // Automatically select the corresponding client
-      setTask(null);  // Reset the task when the project changes
-    }
-  };
-
-  const filteredProjects = dataProjects.filter(p => p.client_id === client); // Filter projects based on selected client
-  const dataValue = dataItem[field] === null ? '' : dataItem[field];
-
-  return (
-    <td>
-      {dataItem.inEdit ? (
-        <AutoComplete
-          style={{ width: '100px' }}
-          onChange={handleChange}
-          value={value} // The value now reflects the typed input
-          data={client ? filteredProjects : dataProjects} // Filtered projects based on the selected client
-          textField="text" // Specifies which field to display as the text
-          dataItemKey="value" // Specifies the key used to identify each item
-          placeholder="Type to search project..." // Optional placeholder for guidance
-        />
-      ) : dataValue == null ? (
-        ''
-      ) : (
-        filteredProjects.find(p => p.value === dataValue)?.text || dataValue
-      )}
-    </td>
-  );
-};
-
-const TaskDropDownCell = ({ dataItem, field, onChange, client, project, task, setClient, setProject, setTask, dataTasks }) => {
-  const [value, setValue] = React.useState(task ? dataTasks.find(t => t.value === task)?.text : ''); // Track typed value
-
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
-    setValue(selectedValue); // Update local input value
-
-    // Find the corresponding task object based on input
-    const selectedTask = dataTasks.find(t => t.text === selectedValue);
-
-    if (onChange && selectedTask) {
-      onChange({
-        dataIndex: 0,
-        dataItem,
-        field,
-        syntheticEvent: e.syntheticEvent,
-        value: selectedTask.value
-      });
-    }
-
-    if (selectedTask) {
-      setTask(selectedTask.value);
-      setProject(selectedTask.project_id); // Automatically select the corresponding project
-      setClient(selectedTask.client_id);  // Automatically select the corresponding client
-    }
-  };
-
-  const filteredTasks = dataTasks.filter(t => t.client_id === client && t.project_id === project); // Filter tasks based on client and project
-  const dataValue = dataItem[field] === null ? '' : dataItem[field];
-
-  return (
-    <td>
-      {dataItem.inEdit ? (
-        <AutoComplete
-          style={{ width: '100px' }}
-          onChange={handleChange}
-          value={value} // The value now reflects the typed input
-          data={(client && project) ? filteredTasks : client ? dataTasks.filter(t => t.client_id === client) : dataTasks} // Filter tasks based on client and project
-          textField="text" // Specifies which field to display as the text
-          dataItemKey="value" // Specifies the key used to identify each item
-          placeholder="Type to search task..." // Optional placeholder
-        />
-      ) : dataValue == null ? (
-        ''
-      ) : (
-        filteredTasks.find(t => t.value === dataValue)?.text || dataValue
-      )}
-    </td>
-  );
-};
-
+import {v4 as uuidv4} from 'uuid';
 
 
 
@@ -213,19 +51,11 @@ const MyBooleanCustomCell = (props) => <CustomCell {...props} color="pink" />;
 
 
 const TaskHour = () => {
-  const initialFilter = {
-    logic: "and", // or "or"
-    filters: []
-  };
-    const [filter, setFilter] = React.useState(initialFilter);
   const [data, setData] = React.useState([]);
   const [timesheetData, setTimesheetData] = React.useState([]);
   const [clientData, setClientData] = React.useState([]);
   const [projectData, setProjectData] = React.useState([]);
   const [taskData, setTaskData] = React.useState([]);
-  const [client, setClient] = React.useState(null);
-  const [project, setProject] = React.useState(null);
-  const [task, setTask] = React.useState(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showAlert, setShowAlert] = React.useState(false)
@@ -248,21 +78,9 @@ const TaskHour = () => {
   React.useEffect(() => {
     const getMetadata = async () => {
       const metadata = await fetchMetaData();
-      const dataClients = metadata.clients.map(client => ({
-        value: client.id,
-        text: client.name,
-      }));
-      const dataProjects = metadata.projects.map(project => ({
-        client_id: project.client_id,
-        value: project.id,
-        text: project.name,
-      }));
-      const dataTasks = metadata.tasks.map(task => ({
-        project_id: task.project_id,
-        value: task.id,
-        text: task.name,
-        client_id: task.client_id,
-      }));
+      const dataClients = metadata.clients
+      const dataProjects = metadata.projects
+      const dataTasks = metadata.tasks
 
       setClientData(dataClients);
       setProjectData(dataProjects);
@@ -325,8 +143,11 @@ const TaskHour = () => {
   }, []);
 
   const enterInsert = () => {
+    let myuuid = uuidv4();
+    console.log(myuuid)
     const dataItem = {
-      id: undefined,
+      id: myuuid,
+      new_id: undefined,
       client_name: '',
       project_name: '',
       task_name: '',
@@ -342,12 +163,137 @@ const TaskHour = () => {
     setData([dataItem, ...data]);
   };
 
-  const enterEdit = dataItem => {
-    setData(data.map(item => (item.id === dataItem.id ? { ...item, inEdit: true } : item)));
-    setClient(dataItem.client_id)
-    setProject(dataItem.project_id)
-    setTask(dataItem.task_id)
+  
+const allInEdit = () => {
+  setData(data.map(item => ({...item, inEdit: true })));
+};
+
+const DropDownCell = props => {
+  const localizedData = clientData;
+  const { dataItem } = props;
+
+  const handleChange = e => {
+      if (props.onChange) {
+          const client = e.target.value; // Get the selected client object
+          console.log(props.dataItem)
+          props.onChange({
+              dataItem: {
+                  ...props.dataItem,
+                  project_id: "", // Reset project_id
+                  task_id: "",    // Reset task_id
+              },
+              field: 'client_id', // Set client_id instead of client_name
+              syntheticEvent: e.syntheticEvent,
+              value: client.id, // Set client ID
+          });
+          console.log(props.dataItem)
+      }
   };
+
+  const field = 'client_id'; // Use client_id field
+  const dataValue = dataItem[field] === null ? '' : dataItem[field];
+
+  return (
+      <td>
+          {dataItem.inEdit ? (
+              <DropDownList
+                  style={{ width: '100px' }}
+                  onChange={handleChange}
+                  value={localizedData.find(c => c.id === dataValue)}
+                  data={localizedData}
+                  textField="name"
+              />
+          ) : (
+              localizedData.find(c => c.id === dataValue)?.name || '' // Render the client name or empty string
+          )}
+      </td>
+  );
+};
+
+const ProjectDropDownCell = props => {
+  const localizedData = projectData;
+  const handleChange = e => {
+      if (props.onChange) {
+          const project = e.target.value; // Get the selected project object
+          props.onChange({
+              dataItem: {
+                  ...props.dataItem,
+                  client_id: project.client_id,
+                  task_id: "", // Reset task_id when project changes
+              },
+              field: 'project_id', // Set project_id instead of project_name
+              syntheticEvent: e.syntheticEvent,
+              value: project.id, // Set project ID
+          });
+      }
+  };
+
+  const { dataItem } = props;
+  const filteredProject = dataItem.client_id ? localizedData.filter(project => project.client_id === dataItem.client_id) : localizedData;
+
+  const field = 'project_id'; // Use project_id field
+  const dataValue = dataItem[field] === null ? '' : dataItem[field];
+
+  return (
+      <td>
+          {dataItem.inEdit ? (
+              <DropDownList
+                  style={{ width: '100px' }}
+                  onChange={handleChange}
+                  value={localizedData.find(p => p.id === dataValue)}
+                  data={filteredProject}
+                  textField="name"
+              />
+          ) : (
+              localizedData.find(p => p.id === dataValue)?.name || '' // Render the project name or empty string
+          )}
+      </td>
+  );
+};
+
+const TaskDropDownCell = props => {
+  const localizedData = taskData;
+  const handleChange = e => {
+      if (props.onChange) {
+          const task = e.target.value; // Get the selected task object
+          console.log(task)
+          props.onChange({
+              dataItem: {
+                  ...props.dataItem,
+                  task_id: task.id,
+                  project_id: task.project_id, // Reset project_id
+                  client_id: task.client_id,    // Reset task_id
+              },
+              field: 'task_id', // Set task_id instead of task_name
+              syntheticEvent: e.syntheticEvent,
+              value: task.id, // Set task ID
+          });
+          console.log(props.dataItem)
+      }
+  };
+
+  const { dataItem } = props;
+  const filteredTask = dataItem.project_id ? localizedData.filter(task => task.project_id === dataItem.project_id) : dataItem.client_id ? localizedData.filter(task => task.client_id === dataItem.client_id) : localizedData;
+  const field = 'task_id'; // Use task_id field
+  const dataValue = dataItem[field] === null ? '' : dataItem[field];
+
+  return (
+      <td>
+          {dataItem.inEdit ? (
+              <DropDownList
+                  style={{ width: '100px' }}
+                  onChange={handleChange}
+                  value={localizedData.find(t => t.id === dataValue)}
+                  data={filteredTask}
+                  textField="name"
+              />
+          ) : (
+              localizedData.find(t => t.id === dataValue)?.name || '' // Render the task name or empty string
+          )}
+      </td>
+  );
+};
+
 
   const save = async dataItem => {
     if (!dataItem.new_id) {
@@ -432,9 +378,6 @@ const TaskHour = () => {
     }
 
     getListing();
-    setClient(null);
-    setProject(null)
-    setTask(null);
   };
 
   const cancel = dataItem => {
@@ -476,97 +419,84 @@ const TaskHour = () => {
         setOpenDialog(true);
     };
 
-  const itemChange = event => {
-    const { value, field } = event;
-    const newValue = field === 'start_date' ? new Date(value) : value;
-    setData(data.map(item => (item.id === event.dataItem.id ? { ...item, [field]: newValue } : item)));
+    const itemChange = e => {
+      let newData = data.map(item => {
+          if (item.id === e.dataItem.id) {
+              item[e.field || ''] = e.value;
+              // Reset project_id and task_id when client_id changes
+              if (e.field === 'client_id') {
+                  item.project_id = '';
+                  item.task_id = '';
+              } else if (e.field === 'task_id') {
+                  item.client_id = e.dataItem.client_id;
+                  item.project_id = e.dataItem.project_id;
+              } else if(e.field === 'project_id') {
+                  item.client_id = e.dataItem.client_id;
+                  item.task_id = '';
+              }
+          }
+          return item;
+      });
+      setData(newData);
   };
+  
 
 
   const MyCommandCell = props => (
     <td>
-      {!props.dataItem.inEdit ? (
+      {!props.dataItem.inEdit && (
         <>
-          <Button
-            themeColor={'primary'}
-            style={{ marginRight: '10px' }} // Add margin between buttons
-            onClick={() => enterEdit(props.dataItem)}
-          >
-            Edit
-          </Button>
-          <Button onClick={() => remove(props.dataItem)}>
+          <Button themeColor={'primary'} onClick={() => remove(props.dataItem)}>
             Remove
-          </Button>
-        </>
-      ) : (
-        <>
-          <Button
-            themeColor={'primary'}
-            style={{ marginRight: '10px' }} // Add margin between buttons
-            onClick={() => save(props.dataItem)}
-          >
-            {props.dataItem.id ? 'Update' : 'Add'}
-          </Button>
-          <Button onClick={() => cancel(props.dataItem)}>
-            {props.dataItem.id ? 'Cancel' : 'Discard changes'}
           </Button>
         </>
       )}
     </td>
   );
   
-  const NumericCell = ({ dataItem, field, onChange }) => {
-    const handleChange = (e) => {
-      const value = e.value;
-      onChange({
-        dataIndex: 0,
-        dataItem,
-        field,
-        syntheticEvent: e.syntheticEvent,
-        value,
-      });
-    };
-  
-    return (
-      <td>
-        {dataItem.inEdit ? (
-          <Field
-            name={field}
-            validator={() => numericValidator(dataItem[field])} // Apply validator here
-            render={({ validationMessage, value, ...fieldRenderProps }) => (
-              <>
-                <NumericTextBox
-                  {...fieldRenderProps}
-                  value={value === null ? 0 : value}
-                  onChange={handleChange}
-                  min={0} // Optional: Set minimum value
-                  max={24} // Set max value to 24 for NumericTextBox
-                  width="100%"
-                />
-                {validationMessage && (
-                  <div style={{ color: "red" }}>{validationMessage}</div>
-                )}
-              </>
-            )}
-          />
-        ) : (
-          dataItem[field]
-        )}
-      </td>
-    );
-  };
-  
-  const allInEdit =() => {
-    const updatedData =  data.map((item) =>
-      Object.assign(
-        {
-          inEdit: true,
-        },
-        item
-      )
-    );
-    setData(updatedData)
+  const handleSaveData = () => {
+    console.log('Saved data:', data)
+    const updatedData = data.map(dataItem => {
+      return ({
+          new_id: dataItem.new_id,
+          values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
+          task_id: dataItem.task_id,
+          timesheet_id: timesheetId
+      })
+  })
+    console.log(updatedData)
+    const newRows = updatedData.filter(dataItem => !dataItem.new_id); // New rows where new_id is undefined
+    const updatedRows = updatedData.filter(dataItem => dataItem.new_id);
+    console.log(newRows)
+    console.log(updatedRows)
+
+    const matchingTaskIds = newRows.filter(newRow => 
+      updatedRows.some(updatedRow => updatedRow.task_id === newRow.task_id)
+  );
+  console.log(matchingTaskIds);
+  if(matchingTaskIds.length > 0){
+    console.log('Your are adding duplicate task')
+    return;
   }
+
+    
+    const fetchData = async() => {
+        try {
+            const data1 = await PostRequestHelper('addtaskhours', {newRows, updatedRows}, navigate);
+            console.log(data1);
+            if(data1.status === 201){
+                console.log(data1)
+            }else if(data1.status === 400 || data1.status ===409){
+                console.log(data1)
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
+    }
+    fetchData();
+    getListing();
+  }
+  
 
   const handleApprovalSubmit = async(dataItem) => {
     try {
@@ -590,7 +520,6 @@ const TaskHour = () => {
       getListing();
     }
   }
-  console.log('data',task,client,project);
   return (
     <div>
           <HeaderLayout>
@@ -619,11 +548,7 @@ const TaskHour = () => {
             </Grid>
             </div>
       <Grid
-        data={filterBy(data, filter)}
-        navigatable={true}
-        filterable={true}
-        filter={filter}
-        onFilterChange={(e) => setFilter(e.filter)}
+        data={data}
         onItemChange={itemChange}
         editField="inEdit"
         cells={{
@@ -637,62 +562,32 @@ const TaskHour = () => {
         {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <GridToolbar>
             <Button title="Add new" type="button" onClick={enterInsert}>
-              Add new
-            </Button>
-            <Button title="Edit" type="button" onClick={allInEdit}>
-              Edit
-            </Button>
+                    Add new
+                </Button>
+                {data.length > 0 && (
+                    <Button title="Edit" type="button" onClick={allInEdit}>
+                        Edit
+                    </Button>
+                )}
+
+                <Button title="Save" type="button" onClick={handleSaveData}>
+                Save
+                </Button>
           </GridToolbar>
         )}
           
       
-        <Column field="new_id" title="Id" editable={false} width={"50px"}/>
-        <Column field="client_name" title="Client Name" cell={props=>
-          <DropDownCell 
-            {...props} 
-            project={project} 
-            task={task} 
-            client={client} 
-            setClient={setClient} 
-            setProject={setProject} 
-            setTask={setTask}
-            dataClients={clientData}  // Pass client data here
-          />} 
-          editor='text' 
-        />
-        <Column field="project_name" title="Project Name" cell={props=>
-          <ProjectDropDownCell 
-            {...props} 
-            project={project} 
-            task={task} 
-            client={client} 
-            setClient={setClient} 
-            setProject={setProject} 
-            setTask={setTask} 
-            dataProjects={projectData}  // Pass project data here
-          />} 
-          editor="text" 
-        />
-        <Column field="task_name" title="Task Name" cell={props=>
-          <TaskDropDownCell 
-            {...props} 
-            project={project} 
-            task={task} 
-            client={client} 
-            setClient={setClient} 
-            setProject={setProject} 
-            setTask={setTask} 
-            dataTasks={taskData}  // Pass task data here
-          />} 
-          editor="text" 
-        />
-        <Column field="mon" title="Mon" editor="numeric" format="{0:n}" filterCell={RangeFilterCell}/>
-        <Column field="tue" title="Tue" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
-        <Column field="wed" title="Wed" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
-        <Column field="thu" title="Thu" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
-        <Column field="fri" title="Fri" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
-        <Column field="sat" title="Sat" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
-        <Column field="sun" title="Sun" editor="numeric" format="{0:n}"  filterCell={RangeFilterCell}/>
+          <Column field="new_id" title="Id" editable={false} width={"50px"}/>
+            <Column field="client_name" title="Client Name" editor='text' cell={DropDownCell}/>
+            <Column field="project_name" title="Project Name" editor='text' cell={ProjectDropDownCell}/>
+            <Column field="task_name" title="Task Name" editor='text' cell={TaskDropDownCell}/>
+            <Column field="mon" title="Mon" editor="numeric" format="{0:n}" />
+            <Column field="tue" title="Tue" editor="numeric" format="{0:n}" />
+            <Column field="wed" title="Wed" editor="numeric" format="{0:n}" />
+            <Column field="thu" title="Thu" editor="numeric" format="{0:n}" />
+            <Column field="fri" title="Fri" editor="numeric" format="{0:n}" />
+            <Column field="sat" title="Sat" editor="numeric" format="{0:n}" />
+            <Column field="sun" title="Sun" editor="numeric" format="{0:n}" />
         {((timesheetData[0]?.approval === 'DRAFT' || timesheetData[0]?.approval === 'REJECTED') && !showCard) && (
           <Column cell={MyCommandCell} title="Actions" filterable={false}/>
         )}

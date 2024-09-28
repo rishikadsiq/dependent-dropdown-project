@@ -41,6 +41,10 @@ const TaskGuideMe = ({ setProjectComponent, setTaskComponent, setUserComponent})
     getListing(); // Call the function to fetch data
 }, []);
 
+  React.useEffect(() => {
+    getListing();
+  },[openSuccessDialog])
+
 const toggleSuccessDialog = () => {
   setOpenSuccessDialog(false)
 }

@@ -7,7 +7,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {v4 as uuidv4} from 'uuid';
 import { GetRequestHelper } from '../helper/GetRequestHelper';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
-import { symbolIcon } from '@progress/kendo-svg-icons';
 
 
 
@@ -46,7 +45,7 @@ const App = () => {
     console.log(myuuid)
     const dataItem = {
       id: myuuid,
-      new_id: myuuid,
+      new_id: undefined,
       client_name: '',
       client_id: '',
       project_name: '',
@@ -98,6 +97,7 @@ const fetchMetaData = async () => {
     const handleChange = e => {
         if (props.onChange) {
             const client = e.target.value; // Get the selected client object
+            console.log(props.dataItem)
             props.onChange({
                 dataItem: {
                     ...props.dataItem,
@@ -108,6 +108,7 @@ const fetchMetaData = async () => {
                 syntheticEvent: e.syntheticEvent,
                 value: client.id, // Set client ID
             });
+            console.log(props.dataItem)
         }
     };
 
@@ -177,9 +178,11 @@ const TaskDropDownCell = props => {
     const handleChange = e => {
         if (props.onChange) {
             const task = e.target.value; // Get the selected task object
+            console.log(task)
             props.onChange({
                 dataItem: {
                     ...props.dataItem,
+                    task_id: task.id,
                     project_id: task.project_id, // Reset project_id
                     client_id: task.client_id,    // Reset task_id
                 },
@@ -187,6 +190,7 @@ const TaskDropDownCell = props => {
                 syntheticEvent: e.syntheticEvent,
                 value: task.id, // Set task ID
             });
+            console.log(props.dataItem)
         }
     };
 
@@ -219,6 +223,12 @@ const itemChange = e => {
             // Reset project_id and task_id when client_id changes
             if (e.field === 'client_id') {
                 item.project_id = '';
+                item.task_id = '';
+            } else if (e.field === 'task_id') {
+                item.client_id = e.dataItem.client_id;
+                item.project_id = e.dataItem.project_id;
+            } else if(e.field === 'project_id') {
+                item.client_id = e.dataItem.client_id;
                 item.task_id = '';
             }
         }

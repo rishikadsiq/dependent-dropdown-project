@@ -1,7 +1,7 @@
 
 export const GetRequestHelper = async (endpoint, navigate) => {
 
-  const access_token = localStorage.getItem('access_token');
+  let access_token = localStorage.getItem('access_token');
   const refresh_token = localStorage.getItem('refresh_token');
 
   // Check if both tokens are null
@@ -11,7 +11,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     return;
   }
 
-  const fetchWithToken = async () => {
+  const fetchWithToken = async (access_token) => {
     const response = await fetch(`http://localhost:5000/${endpoint}`, {
       method: "GET",
       headers: {
@@ -23,7 +23,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     return data
   };
 
-  let response = await fetchWithToken();
+  let response = await fetchWithToken(access_token);
 
   if (response?.message === 'Signature has expired') { // If the token has expired
     console.log("Access token expired. Attempting to refresh token...");
@@ -43,9 +43,10 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     if (tokenRefreshResponse.ok) {
       // Save the new access token to localStorage
       localStorage.setItem('access_token', tokenData.access_token);
+      access_token = localStorage.getItem('access_token'); // Update the access token for the next request
 
       // Retry the original request with the new access token
-      response = await fetchWithToken();
+      response = await fetchWithToken(access_token);
     } else {
       console.error("Unable to refresh token. Redirecting to login.");
       navigate('/login'); // Navigate to login page if refresh fails

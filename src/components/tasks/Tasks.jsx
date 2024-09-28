@@ -208,6 +208,7 @@ const addNewFromProjects = (localdata) => {
                     setShowAlert(true)
                     setVariant("success")
                     localStorage.removeItem('to_be_add');
+                    getListing();
                 }
                 else if(data1.status === 409 ){
                     setShowDuplicateDialog(true)

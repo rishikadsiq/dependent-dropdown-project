@@ -22,13 +22,15 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
       },
       body: JSON.stringify(dataItem), // Send dataItem in request body
     });
-    return response;
+    const data = await response.json();
+    return data;
   };
 
   // First attempt with the current access token
   let response = await fetchWithToken(access_token);
+  console.log(response)
 
-  if (response.status === 401) { // If the access token has expired
+  if (response.message === 'Signature has expired') { // If the access token has expired
     console.log("Access token expired. Attempting to refresh token...");
 
     // Attempt to refresh the token
@@ -46,9 +48,10 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
     if (tokenRefreshResponse.ok) {
       // Save the new access token to localStorage
       localStorage.setItem('access_token', tokenData.access_token);
+      access_token = localStorage.getItem('access_token');
 
       // Retry the original POST request with the new access token
-      response = await fetchWithToken(tokenData.access_token);
+      response = await fetchWithToken(access_token);
     } else {
       console.error("Unable to refresh token. Redirecting to login.");
       navigate('/login'); // Redirect to login if refresh fails
@@ -57,6 +60,5 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
   }
 
   // Parse and return the final response data
-  const data = await response.json();
-  return data;
+  return response
 };

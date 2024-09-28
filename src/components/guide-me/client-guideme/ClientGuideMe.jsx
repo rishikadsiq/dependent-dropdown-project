@@ -32,8 +32,9 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
     const [openConflictDialog, setOpenConflictDialog] = React.useState(false);
     const navigate = useNavigate()
 
-    const getListing = () => {
+    const getListing = async () => {
       const localData = JSON.parse(localStorage.getItem('guideMeClientData'));
+      console.log(localData)
       if (localData) {
         const updatedData = localData.map((client, index) =>{
           return {
@@ -48,7 +49,7 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
     React.useEffect(() => {
       getListing();
       addNew();
-    }, [])
+    }, [clientComponent])
 
   const toggleSuccessDialog = () => {
     setOpenSuccessDialog(false)
@@ -107,10 +108,12 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
         }
         fetchData(); // Call the function to fetch data
     }
-    getListing()
     setOpenAddForm(false);
-    
   };
+
+  React.useEffect(() => {
+    getListing();
+  },[openSuccessDialog])
 
 
   const addNew = () => {

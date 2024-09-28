@@ -32,6 +32,10 @@ const Users = ({setUserComponent, setTaskComponent}) => {
     addNew()
 }, []);
 
+  React.useEffect(() => {
+    getListing();
+  },[openSuccessDialog])
+
 const toggleSuccessDialog = () => {
   setOpenSuccessDialog(false)
 }

@@ -40,6 +40,7 @@ const ProjectGuideMe = ({setClientComponent, setProjectComponent, setTaskCompone
 
     const getListing = () => {
       const localData = JSON.parse(localStorage.getItem('guideMeProjectData'));
+      console.log(localData)
       if (localData) {
         const updatedData = localData.map((project, index) =>{
           return {
@@ -149,8 +150,11 @@ React.useEffect(() => {
         setOpenAddForm(false)
         setOpenAddFormFromClients(false)
     }
-    getListing()
   };
+
+  React.useEffect(() => {
+    getListing()
+  },[openSuccessDialog])
 
 
   const addNew = () => {

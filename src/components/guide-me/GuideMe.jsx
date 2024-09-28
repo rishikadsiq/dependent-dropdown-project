@@ -19,22 +19,14 @@ const GuideMe = () => {
   useEffect(() => {
     const handleRouteChange = () => {
       if (!location.pathname.includes('/guide-me')) {
-        // Clear specific localStorage data when navigating away from GuideMe
         localStorage.removeItem('guideMeTaskData');
         localStorage.removeItem('guideMeUserData');
         localStorage.removeItem('guideMeProjectData');
         localStorage.removeItem('guideMeClientData')
     }
   };
-
-  // Call the function initially in case the component is rendered with a non-guide-me route
   handleRouteChange();
-
-  // Listen for future route changes
-  return () => {
-    handleRouteChange();
-  };
-}, [location]);
+}, [location.pathname]);
   return (
     <HeaderLayout>
         <div>GuideMe</div>
