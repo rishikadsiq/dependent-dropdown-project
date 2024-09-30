@@ -52,6 +52,7 @@ const MyBooleanCustomCell = (props) => <CustomCell {...props} color="pink" />;
 
 const TaskHour = () => {
   const [data, setData] = React.useState([]);
+  const [originalData, setOriginalData] = React.useState([]);
   const [timesheetData, setTimesheetData] = React.useState([]);
   const [clientData, setClientData] = React.useState([]);
   const [projectData, setProjectData] = React.useState([]);
@@ -109,6 +110,7 @@ const TaskHour = () => {
         new_id: index + 1,
       }));
       setData(updatedData || []);
+      setOriginalData(updatedData || []);
       setTimesheetData([data1.timesheet_details])
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -459,32 +461,64 @@ const TaskDropDownCell = props => {
     const updatedData = data.map(dataItem => {
       return ({
           new_id: dataItem.new_id,
+          id: dataItem.id,
           values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
           task_id: dataItem.task_id,
           timesheet_id: timesheetId
       })
   })
     console.log(updatedData)
+    const countUniqueTaskIds = (data) => {
+      const uniqueTaskIds = new Set();
+  
+      data.forEach(item => {
+          uniqueTaskIds.add(item.task_id);
+      });
+  
+      return uniqueTaskIds.size; // Returns the count of unique task_ids
+  };
+
+  if(countUniqueTaskIds(updatedData) !== updatedData.length){
+    setMessage('You are adding duplicate tasks')
+    setVariant('danger')
+    setShowAlert(true)
+    console.log('Your are adding duplicate task')
+    return;
+  }
     const newRows = updatedData.filter(dataItem => !dataItem.new_id); // New rows where new_id is undefined
+    const dropiddata = newRows.map(row => {
+      return ({
+        values: row.values,
+        task_id: row.task_id,
+        timesheet_id: timesheetId
+      })
+    })
+
     const updatedRows = updatedData.filter(dataItem => dataItem.new_id);
-    console.log(newRows)
     console.log(updatedRows)
 
     const matchingTaskIds = newRows.filter(newRow => 
       updatedRows.some(updatedRow => updatedRow.task_id === newRow.task_id)
   );
   console.log(matchingTaskIds);
+
   if(matchingTaskIds.length > 0){
     console.log('Your are adding duplicate task')
     return;
   }
+  // filtering changed values:
+  const taskhoursData = [...dropiddata, ...updatedRows];
+  
 
     
     const fetchData = async() => {
         try {
-            const data1 = await PostRequestHelper('addtaskhours', {newRows, updatedRows}, navigate);
+            const data1 = await PostRequestHelper('savetaskhours',taskhoursData, navigate);
             console.log(data1);
-            if(data1.status === 201){
+            if(data1.status === 200){
+                setShowAlert(true);
+                setMessage(data1.message);
+                setVariant("success")
                 console.log(data1)
             }else if(data1.status === 400 || data1.status ===409){
                 console.log(data1)
@@ -535,7 +569,7 @@ const TaskDropDownCell = props => {
             )}
             
             {/* Main content with header and grid */}
-            <div className='mt-3 mb-3'>
+            <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
                 <h4>Timesheet Data</h4>
             </div>
             <div className='mb-3'>
