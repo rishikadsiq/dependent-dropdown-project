@@ -4,7 +4,6 @@ import { Button } from "@progress/kendo-react-buttons";
 import {PostRequestHelper} from '../../helper/PostRequestHelper'
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddClientGuideMe from './AddClientGuideMe';
-import HeaderLayout from '../../home/HeaderLayout';
 import { useNavigate } from 'react-router-dom';
 
 const EditCommandCell = props => {
@@ -34,7 +33,6 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
 
     const getListing = async () => {
       const localData = JSON.parse(localStorage.getItem('guideMeClientData'));
-      console.log(localData)
       if (localData) {
         const updatedData = localData.map((client, index) =>{
           return {
@@ -78,12 +76,10 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
       return item;
     });
     if (newItem) {
-        console.log(event)
     //   newData.push(event);
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 
                 const data1 = await PostRequestHelper('addclient', event, navigate);
                 if(data1.status === 201){
@@ -99,9 +95,7 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
                 else if(data1.status === 409){
                     setOpenConflictDialog(true)
                 } else if(data1.status === 400){
-                  console.log(data1.message)
                 }
-                console.log(data1);
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
@@ -128,7 +122,6 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
   };
 
   return <React.Fragment>
-            <HeaderLayout>
                 <div className='mt-3 mb-3'>
                     <h4>Clients</h4>
                 </div>
@@ -199,7 +192,6 @@ const ClientGuideMe = ({setClientComponent, setProjectComponent, clientComponent
                     z-index: 10003;
                 }`}
             </style>
-            </HeaderLayout>
         </React.Fragment>;
 };
 export default ClientGuideMe;

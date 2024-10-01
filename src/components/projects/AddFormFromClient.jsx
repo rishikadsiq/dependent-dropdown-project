@@ -30,7 +30,6 @@ const AddFormFromClient = (props) => {
           };
         });
         
-        console.log(updatedData)
         setClientData(updatedData);
       }
     } catch (err) {

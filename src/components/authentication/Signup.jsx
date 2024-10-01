@@ -32,7 +32,6 @@ const Signup = () => {
   };
 
   const handleSubmit = async (formData) => {
-    console.log("Sign Up form submitted", formData);
     const response = await fetch("http://127.0.0.1:5000/register", {
       method: 'POST',
       body: JSON.stringify({
@@ -49,16 +48,13 @@ const Signup = () => {
       },
     });
     const response1 = await response.json();
-    console.log(response1);
     if (response1.status === 201) {
-      console.log("Form data submitted successfully!");
       setMessage(response1.message);
       setShowAlert(true);
       setVariant("success");
       localStorage.setItem('thankyou_message',JSON.stringify(response1));
       navigate('/login');
     } else if (response1.status === 409) {
-      console.log(response1.message);
       setMessage(response1.message);
       setShowAlert(true);
       setVariant("danger");

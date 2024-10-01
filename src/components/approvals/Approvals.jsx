@@ -87,18 +87,15 @@ const Approvals = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('approverlist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            console.log(data1)
             const updatedData = data1.timesheets.map((item, index) => ({
                 ...item, // Spread the other properties
                 new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
-            console.log(updatedData);
             
             setData(updatedData || []);
         }

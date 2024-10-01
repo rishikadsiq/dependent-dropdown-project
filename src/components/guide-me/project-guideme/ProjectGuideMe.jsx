@@ -4,7 +4,6 @@ import { Button } from "@progress/kendo-react-buttons";
 import {PostRequestHelper} from '../../helper/PostRequestHelper'
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import AddFormProject from './AddFormProject'
-import HeaderLayout from '../../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 
 import AddFormFromClientGuideMe from './AddFormFromClientGuideMe';
@@ -40,7 +39,6 @@ const ProjectGuideMe = ({setClientComponent, setProjectComponent, setTaskCompone
 
     const getListing = () => {
       const localData = JSON.parse(localStorage.getItem('guideMeProjectData'));
-      console.log(localData)
       if (localData) {
         const updatedData = localData.map((project, index) =>{
           return {
@@ -107,11 +105,9 @@ React.useEffect(() => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 let updatedEvent = {}
                 if(event.client_id.client_id){
                   updatedEvent = {...event, client_id: event.client_id.client_id}
@@ -119,7 +115,6 @@ React.useEffect(() => {
                    updatedEvent = {...event}
                }
                   
-                console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 
                 const data1 = await PostRequestHelper('addproject', updatedEvent, navigate);
@@ -138,10 +133,8 @@ React.useEffect(() => {
                     setShowDuplicateDialog(true)
                 }
                 else if(data1.status === 400 ){
-                    console.log(data1.message)
                     localStorage.removeItem('to_be_add');
                 }
-                console.log(data1);
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
@@ -179,7 +172,6 @@ React.useEffect(() => {
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
                 const data1 = await PostRequestHelper('addduplicateproject', parsedData, navigate)
-                console.log(data1)
                 if(data1.status === 201) {
                         localStorage.removeItem('to_be_add');
                         localStorage.setItem('selectedProject', JSON.stringify({ 'name': data1.name, 'id': data1.id, 'client_name': data1.client_name, 'client_id': data1.client_id, start_date: data1.start_date, end_date: data1.end_date}));
@@ -202,7 +194,6 @@ React.useEffect(() => {
     toggleDuplicateDialog();
   }
   return <React.Fragment>
-            <HeaderLayout>
             {/* Main content with header and grid */}
             <div className='mt-3 mb-3'>
                 <h4>Projects</h4>
@@ -300,7 +291,6 @@ React.useEffect(() => {
                     z-index: 10003;
                 }`}
             </style>
-            </HeaderLayout>
         </React.Fragment>;
 };
 export default ProjectGuideMe;

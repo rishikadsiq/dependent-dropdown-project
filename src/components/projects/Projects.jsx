@@ -97,18 +97,15 @@ const Projects = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('projectlist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            console.log(data1)
             const updatedData = data1.projects.map((item, index) => ({
                 ...item, // Spread the other properties
                 new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
-            console.log(updatedData);
             
             setData(updatedData || []);
         }
@@ -158,7 +155,6 @@ React.useEffect(() => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -192,11 +188,9 @@ React.useEffect(() => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 let updatedEvent = {}
                 if(event.client_id.id){
                    updatedEvent = {...event, client_id: event.client_id.id}
@@ -204,7 +198,6 @@ React.useEffect(() => {
                     updatedEvent = {...event}
                 }
                   
-                console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 
                 const data1 = await PostRequestHelper('addproject', updatedEvent, navigate);
@@ -225,7 +218,6 @@ React.useEffect(() => {
                     setVariant("danger")
                     localStorage.removeItem('to_be_add');
                 }
-                console.log(data1);
             } catch (err) {
                 console.error('Error fetching data:', err);
             }
@@ -236,7 +228,6 @@ React.useEffect(() => {
     } else {
         const fetchData = async() => {
             try {
-                console.log(event);
                 const orignalData = data.find(item => item.id ===event.id);
 
                     // Function to find changed properties in the event object compared to orignalData
@@ -252,7 +243,6 @@ React.useEffect(() => {
                   
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
-                console.log(changedData) 
                 const data1 = await PostRequestHelper('updateproject', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
@@ -269,7 +259,6 @@ React.useEffect(() => {
                     setVariant("danger")
                     localStorage.removeItem('to_be_add');
                 }
-                console.log(data1);
                 setOpenEditForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -281,7 +270,6 @@ React.useEffect(() => {
   };
 
   React.useEffect(() => {
-    console.log(confirmNavigate)
     if(confirmNavigate){
         navigate('/tasks');
     }
@@ -314,7 +302,6 @@ React.useEffect(() => {
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
                 const response = await PostRequestHelper('addduplicateproject', parsedData, navigate)
-                console.log(response)
                 if(response.status === 201) {
                     setMessage(response.message)
                         setShowAlert(true)

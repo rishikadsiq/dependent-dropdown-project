@@ -3,7 +3,6 @@ import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-g
 import { Button } from "@progress/kendo-react-buttons";
 import {PostRequestHelper} from '../../helper/PostRequestHelper'
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import HeaderLayout from '../../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 import AddFormUser from './AddFormUser'
 
@@ -57,13 +56,10 @@ const toggleConflictDialog = () => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 const updatedEvent = {...event, approver_id: event.approver_id.id, supervisor_id: event.supervisor_id.id}
-                console.log(updatedEvent)
                 
                 const data1 = await PostRequestHelper('adduser', updatedEvent, navigate);
                 if(data1.status === 201){
@@ -78,9 +74,7 @@ const toggleConflictDialog = () => {
                 else if(data1.status === 409){
                   setOpenConflictDialog(true)
                 } else if(data1.status === 400){
-                  console.log(data1.message)
                 }
-                console.log(data1);
                 getListing()
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -101,7 +95,6 @@ const toggleConflictDialog = () => {
     setOpenAddForm(false);
   };
   return <React.Fragment>
-            <HeaderLayout>
             <div className='mt-3 mb-3'>
                 <h4>Users</h4>
             </div>
@@ -174,7 +167,6 @@ const toggleConflictDialog = () => {
                     z-index: 10003;
                 }`}
             </style>
-            </HeaderLayout>
         </React.Fragment>;
 };
 export default Users;

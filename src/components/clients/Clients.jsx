@@ -84,7 +84,6 @@ const Clients = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('clientlist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
@@ -127,7 +126,6 @@ const Clients = () => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -161,12 +159,10 @@ const Clients = () => {
       return item;
     });
     if (newItem) {
-        console.log(event)
     //   newData.push(event);
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 
                 const data1 = await PostRequestHelper('addclient', event, navigate);
                 if(data1.status === 201){
@@ -182,8 +178,6 @@ const Clients = () => {
                     setShowAlert(true)
                     setVariant("danger")
                 }
-
-                console.log(data1);
                 setOpenAddForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -193,7 +187,6 @@ const Clients = () => {
     } else {
         const fetchData = async() => {
             try {
-                console.log(event);
                 const orignalData = data.find(item => item.id ===event.id);
 
                     // Function to find changed properties in the event object compared to orignalData
@@ -209,7 +202,6 @@ const Clients = () => {
                   
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
-                console.log(changedData) 
                 const data1 = await PostRequestHelper('updateclient', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
@@ -221,7 +213,6 @@ const Clients = () => {
                     setShowAlert(true)
                     setVariant("danger")
                 }
-                console.log(data1);
                 setOpenEditForm(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -235,7 +226,6 @@ const Clients = () => {
 
 
   React.useEffect(() => {
-    console.log(confirmNavigate)
     if(confirmNavigate){
         navigate('/projects');
     }

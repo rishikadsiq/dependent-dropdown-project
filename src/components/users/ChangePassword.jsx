@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // 
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 
-const ChangePassword = () => {
+const ChangePassword = ({setShowButton, setMessage, setVariant, setShowAlert }) => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = React.useState(false);  
     const [showPreviousPassword, setPreviousPassword] = React.useState(false);
@@ -34,14 +34,24 @@ const ChangePassword = () => {
     const handleSubmit = async (formData) => {
         console.log("Reset Password form submitted", formData);
 
+       try{
         const response = await PostRequestHelper('/changepassword', { new_password: formData.password, current_password: formData.current_password }, navigate)
-
-        if (response.ok) {
-            console.log("Form data submitted successfully!");
-            navigate('/login');
-        } else {
-            console.error("Failed to submit form data:", response.statusText);
+        if(response.status===200){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("success")
+        }else if(response.status===401){
+            setMessage(response.message)
+            setShowAlert(true)
+            setVariant("danger")
         }
+       }catch(err){
+        console.log("Error while updating password: " + err)
+       }
+        
+
+
+        setShowButton(false)
     };
 
     return (
@@ -52,6 +62,19 @@ const ChangePassword = () => {
                         <Form onSubmit={handleSubmit} render={formRenderProps =>
                             <FormElement>
                                 <fieldset className={'k-form-fieldset'}>
+                                    <div className="k-form-buttons">
+                                            <Button
+                                                themeColor={"primary"}
+                                                type={"submit"}
+                                                disabled={!formRenderProps.allowSubmit}
+                                            >
+                                                Save Password
+                                            </Button>
+                                            <Button onClick={() => {
+                                                formRenderProps.onFormReset()
+                                                setShowButton(false)
+                                            }}>Cancel</Button>
+                                        </div>
                                     {/* Password Field */}
                                     <div className="position-relative">
                                         <Field
@@ -124,16 +147,7 @@ const ChangePassword = () => {
                                         <FontAwesomeIcon icon={showRetypePassword ? faEyeSlash : faEye} />
                                         </button>
                                     </div>
-                                    <div className="k-form-buttons">
-                                        <Button
-                                            themeColor={"primary"}
-                                            type={"submit"}
-                                            disabled={!formRenderProps.allowSubmit}
-                                        >
-                                            Save Password
-                                        </Button>
-                                        <Button onClick={formRenderProps.onFormReset}>Cancel</Button>
-                                    </div>
+                                   
                                 </fieldset>
                             </FormElement>}
                         />

@@ -20,7 +20,6 @@ const AddFormTask = (props) => {
   const getMetaData = async () => {
     try {
       const localData = JSON.parse(localStorage.getItem('guideMeProjectData'));
-      console.log(localData)
       if(localData){
         const updatedData = localData.map(project => {
           return {
@@ -28,7 +27,6 @@ const AddFormTask = (props) => {
             project_name: project.name, // Change this line
           };
         });
-        console.log(updatedData)
         setProjectData(updatedData);
       }
     } catch (err) {

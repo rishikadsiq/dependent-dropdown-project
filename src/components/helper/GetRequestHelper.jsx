@@ -26,7 +26,6 @@ export const GetRequestHelper = async (endpoint, navigate) => {
   let response = await fetchWithToken(access_token);
 
   if (response?.message === 'Signature has expired') { // If the token has expired
-    console.log("Access token expired. Attempting to refresh token...");
 
     const tokenRefreshResponse = await fetch(`http://localhost:5000/refreshtoken`, {
       method: "POST",
@@ -38,7 +37,6 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     });
 
     const tokenData = await tokenRefreshResponse.json();
-    console.log(tokenData)
 
     if (tokenRefreshResponse.ok) {
       // Save the new access token to localStorage
@@ -54,6 +52,5 @@ export const GetRequestHelper = async (endpoint, navigate) => {
     }
   }
 
-  console.log(response);
   return response;
 };

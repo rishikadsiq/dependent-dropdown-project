@@ -28,7 +28,6 @@ const ResetPassword = () => {
     };
 
     const handleSubmit = async (formData) => {
-        console.log("Reset Password form submitted", formData);
 
         const response = await fetch(`http://127.0.0.1:5000/resetpassword?token=${code}`, {
             method: 'POST',
@@ -37,7 +36,6 @@ const ResetPassword = () => {
         });
 
         if (response.ok) {
-            console.log("Form data submitted successfully!");
             navigate('/login');
         } else {
             console.error("Failed to submit form data:", response.statusText);

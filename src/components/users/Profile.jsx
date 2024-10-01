@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { GetRequestHelper } from '../helper/GetRequestHelper';
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import ChangePassword from './ChangePassword';
+import Alerts from '../dynamic-compoenents/Alerts';
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -18,6 +19,10 @@ const Profile = () => {
   const fileInputRef = useRef(null); // Reference to the file input
   const [data, setData] = useState({});
   const [formData, setFormData] = useState({}); // State to store form data
+  const [showButton, setShowButton] = useState(false)
+  const [showAlert, setShowAlert] = React.useState(false)
+  const [message, setMessage] = React.useState("")
+  const [variant, setVariant] = React.useState(null)
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
@@ -99,6 +104,11 @@ const Profile = () => {
   
     console.log('Changed Profile Data:', changedData);
     const response = await PostRequestHelper('/updateprofile', changedData, navigate)
+    if(response.status===200){
+      setMessage(response.message)
+      setShowAlert(true)
+      setVariant("success")
+    }
     console.log(response)
   
     // Update the state with the new data
@@ -121,7 +131,15 @@ const Profile = () => {
 
   return (
     <HeaderLayout>
-      <h4>Profile Page</h4>
+      {showAlert && (
+                <div className='container'>
+                <Alerts showAlert={showAlert} setShowAlert={setShowAlert} message={message} variant={variant} />
+                </div>
+            )}
+            
+      <div className='mt-3 mb-3' style={{ paddingTop: showAlert ? '60px' : '0' }}>
+        <h4>Profile Page</h4>
+      </div>
       <hr style={{ border: '1px solid #000', margin: '20px 0' }} />
       <div style={{ paddingLeft: '10px' }}>
         <h6>Profile Photo</h6>
@@ -289,7 +307,7 @@ const Profile = () => {
             </Col>
 
             <Col sm="6">
-              <Form.Group controlId="formPlaintextEmail">
+              <Form.Group controlId="formPlaintextApprover">
               <span>
                   <Form.Label>Approver Name</Form.Label>
                 </span>
@@ -303,7 +321,7 @@ const Profile = () => {
 
           <Row className="mb-3">
             <Col sm="6">
-              <Form.Group controlId="formPlaintextEmail">
+              <Form.Group controlId="formPlaintextSupervisor">
               <span>
                   <Form.Label>Supervisor Name</Form.Label>
                 </span>
@@ -315,7 +333,7 @@ const Profile = () => {
             </Col>
 
             <Col sm="6">
-              <Form.Group controlId="formPlaintextEmail">
+              <Form.Group controlId="formPlaintextCompany">
               <span>
                   <Form.Label>Company Name</Form.Label>
                 </span>
@@ -331,10 +349,16 @@ const Profile = () => {
       <hr style={{ border: '1px solid #000', margin: '20px 0' }} />
       <div style={{ paddingLeft: '10px' }}>
         <h6>Security & Privacy</h6>
-          <Button themeColor={'primary'} className='my-2' size={'small'} onClick={() => {console.log('change password')}}>
+        {
+          !showButton && (
+            <Button themeColor={'primary'} className='my-2' size={'small'} onClick={() => setShowButton(true)}>
             Change Password
           </Button>
-          <ChangePassword />
+          )
+        }
+         {showButton && (
+          <ChangePassword setShowButton={setShowButton} setShowAlert={setShowAlert} setMessage={setMessage} setVariant={setVariant} />
+         )}
       </div>
     </HeaderLayout>
   );

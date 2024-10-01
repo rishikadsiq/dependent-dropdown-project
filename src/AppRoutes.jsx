@@ -14,7 +14,7 @@ import ApprovalTimesheet from './components/approvals/ApprovalTimesheet';
 import ResetPassword from './components/authentication/ResetPassword';
 import Profile from './components/users/Profile';
 import GuideMe from './components/guide-me/GuideMe';
-import TaskHoursRefactor from './components/taskhours/TaskHoursRefactor';
+import NotFound from './components/not-found/NotFound';
 
 
 const AppRoutes = () => (
@@ -29,7 +29,7 @@ const AppRoutes = () => (
             {/* Home Urls */}
             
 
-            
+            <Route path="*" element={<NotFound />} />
             <Route path='/' element={<Home />} />
             <Route path='/clients' element={<Clients />} />
             <Route path='/projects' element={<Projects />} />

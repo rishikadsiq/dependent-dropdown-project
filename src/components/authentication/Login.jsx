@@ -22,7 +22,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false); // State for toggling password visibility
 
   const handleSubmit = async (formData) => {
-    console.log("Login form submitted", formData);
     try {
       const fetchData = await fetch("http://127.0.0.1:5000/login", {
         method: 'POST',
@@ -39,14 +38,12 @@ const Login = () => {
         setMessage(response.message);
         setShowAlert(true);
         setVariant("success");
-        console.log("Login successfully");
         const { access_token, refresh_token } = response;
         const decoded = jwtDecode(access_token);
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('userData', JSON.stringify(decoded));
         localStorage.setItem('login_message', JSON.stringify(response))
-        console.log("Navigating to home page...");
         navigate('/');
       } else if (response.status === 401) {
         setShowAlert(true);

@@ -3,7 +3,6 @@ import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-g
 import { Button } from "@progress/kendo-react-buttons";
 import {PostRequestHelper} from '../../helper/PostRequestHelper'
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import HeaderLayout from '../../home/HeaderLayout';
 import { useNavigate } from "react-router-dom";
 import AddFormFromProjectGuideMe from './AddFormFromProjectGuideMe';
 import AddFormTask from './AddFormTask';
@@ -88,11 +87,9 @@ const addNewFromProjects = (localdata) => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 let updatedEvent = {}
                 if(event.project_id.project_id){
                    updatedEvent = {...event, project_id: event.project_id.project_id}
@@ -100,10 +97,8 @@ const addNewFromProjects = (localdata) => {
                     updatedEvent = {...event}
                 }
                 
-                console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 const data1 = await PostRequestHelper('addtask', updatedEvent, navigate);
-                console.log(data1);
                 if(data1.status === 201){
                     localStorage.removeItem('to_be_add');
                     const localData = JSON.parse(localStorage.getItem('guideMeTaskData'))
@@ -119,7 +114,6 @@ const addNewFromProjects = (localdata) => {
                     setShowDuplicateDialog(true)
                 }
                 else if(data1.status === 400 ){
-                    console.log(data1.message)
                     localStorage.removeItem('to_be_add');
                 }
             } catch (err) {
@@ -154,7 +148,6 @@ const addNewFromProjects = (localdata) => {
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
                 const response = await PostRequestHelper('addduplicatetask', parsedData, navigate)
-                console.log(response)
                 if(response.status === 201 || response.status ===200) {
                         localStorage.removeItem('to_be_add');
                         const localData = JSON.parse(localStorage.getItem('guideMeTaskData'))
@@ -177,7 +170,6 @@ const addNewFromProjects = (localdata) => {
     
   }
   return <React.Fragment>
-            <HeaderLayout>
             <div className='mt-3 mb-3'>
                 <h4>Tasks</h4>
             </div>
@@ -272,7 +264,6 @@ const addNewFromProjects = (localdata) => {
                     z-index: 10003;
                 }`}
             </style>
-            </HeaderLayout>
         </React.Fragment>;
 };
 export default TaskGuideMe;

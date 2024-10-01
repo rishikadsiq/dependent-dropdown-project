@@ -19,7 +19,6 @@ const ForgotPassword = () => {
   const [variant, setVariant] = React.useState(null)
 
   const handleSubmit = async (formData) => {
-    console.log("Forgot password email sent", formData);
     const response = await fetch('http://localhost:5000/forgotpassword', {
       method: 'POST',
       headers: {
@@ -32,7 +31,6 @@ const ForgotPassword = () => {
       setMessage('Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder.');
       setShowAlert(true);
       setVariant("success");
-      console.log("Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder.");
     }
   };
 

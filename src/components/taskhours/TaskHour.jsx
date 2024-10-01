@@ -65,6 +65,7 @@ const TaskHour = () => {
   const [showCard, setShowCard] = React.useState(false)
   const [sums, setSums] = React.useState({});
   const [disabled, setDisabled] = React.useState(true)
+  const [showCancelButton, setShowCancelButton] = React.useState(false)
 
   const { timesheetId } = useParams();
   const navigate = useNavigate();
@@ -120,25 +121,21 @@ const TaskHour = () => {
 
   React.useEffect(() => {
     const initialSums = { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0, sun: 0 };
-
+  
     const newSums = data.reduce((acc, item) => {
-      acc.mon += item.mon || 0;
-      acc.tue += item.tue || 0;
-      acc.wed += item.wed || 0;
-      acc.thu += item.thu || 0;
-      acc.fri += item.fri || 0;
-      acc.sat += item.sat || 0;
-      acc.sun += item.sun || 0;
+      ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
+        acc[day] += item[day] || 0;
+      });
       return acc;
     }, initialSums);
-
     setSums(newSums);
-  },[data])
+  }, [originalData]);
+  
 
   React.useEffect(() => {
     const handleApprovalButton = Object.values(sums).every(day => day >= 8);
     setDisabled(!handleApprovalButton);
-  }, [data]);
+  }, [sums]);
 
   React.useEffect(() => {
     getListing();
@@ -146,7 +143,6 @@ const TaskHour = () => {
 
   const enterInsert = () => {
     let myuuid = uuidv4();
-    console.log(myuuid)
     const dataItem = {
       id: myuuid,
       new_id: undefined,
@@ -163,11 +159,13 @@ const TaskHour = () => {
       inEdit: true,
     };
     setData([dataItem, ...data]);
+    setShowCancelButton(true);
   };
 
   
 const allInEdit = () => {
   setData(data.map(item => ({...item, inEdit: true })));
+  setShowCancelButton(true);
 };
 
 const DropDownCell = props => {
@@ -177,7 +175,6 @@ const DropDownCell = props => {
   const handleChange = e => {
       if (props.onChange) {
           const client = e.target.value; // Get the selected client object
-          console.log(props.dataItem)
           props.onChange({
               dataItem: {
                   ...props.dataItem,
@@ -188,7 +185,6 @@ const DropDownCell = props => {
               syntheticEvent: e.syntheticEvent,
               value: client.id, // Set client ID
           });
-          console.log(props.dataItem)
       }
   };
 
@@ -257,8 +253,7 @@ const TaskDropDownCell = props => {
   const localizedData = taskData;
   const handleChange = e => {
       if (props.onChange) {
-          const task = e.target.value; // Get the selected task object
-          console.log(task)
+          const task = e.target.value; 
           props.onChange({
               dataItem: {
                   ...props.dataItem,
@@ -270,7 +265,6 @@ const TaskDropDownCell = props => {
               syntheticEvent: e.syntheticEvent,
               value: task.id, // Set task ID
           });
-          console.log(props.dataItem)
       }
   };
 
@@ -300,17 +294,15 @@ const TaskDropDownCell = props => {
   const save = async dataItem => {
     if (!dataItem.new_id) {
       let updatedDataItem = [{
-        values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
+        values: [dataItem.mon || 0, dataItem.tue || 0, dataItem.wed || 0, dataItem.thu || 0, dataItem.fri || 0, dataItem.sat || 0, dataItem.sun || 0],
         task_id: dataItem.task_name,
         timesheet_id: timesheetId
       }];
       delete updatedDataItem.inEdit;
-      console.log(updatedDataItem)
       
       const fetchData = async() => {
         try {
             const data1 = await PostRequestHelper('addtaskhours', updatedDataItem, navigate);
-            console.log(data1);
             if(data1.status === 201){
                 setMessage(data1.message)
                 setShowAlert(true)
@@ -353,13 +345,10 @@ const TaskDropDownCell = props => {
       changedData['id'] = updatedDataItem.id;
       changedData['values'] = [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun]
       
-      console.log(changedData);
       
       const fetchData = async() => {
         try {
-          console.log(updatedDataItem)
             const data1 = await PostRequestHelper('updatetaskhours', changedData, navigate);
-            console.log(data1);
             if(data1.status === 200){
                 setMessage(data1.message)
                 setShowAlert(true)
@@ -382,12 +371,9 @@ const TaskDropDownCell = props => {
     getListing();
   };
 
-  const cancel = dataItem => {
-    if (!dataItem.id) {
-      setData(data.filter(item => item.id !== undefined));
-    } else {
-      setData(data.map(item => (item.id === dataItem.id ? { ...dataItem, inEdit: false } : item)));
-    }
+  const cancel = () => {
+    setData(originalData)
+    setShowCancelButton(false);
   };
 
   const onDeleteData = async () => {
@@ -404,7 +390,6 @@ const TaskDropDownCell = props => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -457,17 +442,18 @@ const TaskDropDownCell = props => {
   );
   
   const handleSaveData = () => {
-    console.log('Saved data:', data)
+    if(JSON.stringify(data) === JSON.stringify(originalData)){
+      return ;
+    };
     const updatedData = data.map(dataItem => {
       return ({
           new_id: dataItem.new_id,
           id: dataItem.id,
-          values: [dataItem.mon, dataItem.tue, dataItem.wed, dataItem.thu, dataItem.fri, dataItem.sat, dataItem.sun],
+          values: [dataItem.mon || 0, dataItem.tue || 0, dataItem.wed || 0, dataItem.thu || 0, dataItem.fri || 0, dataItem.sat || 0, dataItem.sun || 0],
           task_id: dataItem.task_id,
           timesheet_id: timesheetId
       })
   })
-    console.log(updatedData)
     const countUniqueTaskIds = (data) => {
       const uniqueTaskIds = new Set();
   
@@ -482,7 +468,6 @@ const TaskDropDownCell = props => {
     setMessage('You are adding duplicate tasks')
     setVariant('danger')
     setShowAlert(true)
-    console.log('Your are adding duplicate task')
     return;
   }
     const newRows = updatedData.filter(dataItem => !dataItem.new_id); // New rows where new_id is undefined
@@ -495,17 +480,8 @@ const TaskDropDownCell = props => {
     })
 
     const updatedRows = updatedData.filter(dataItem => dataItem.new_id);
-    console.log(updatedRows)
 
-    const matchingTaskIds = newRows.filter(newRow => 
-      updatedRows.some(updatedRow => updatedRow.task_id === newRow.task_id)
-  );
-  console.log(matchingTaskIds);
-
-  if(matchingTaskIds.length > 0){
-    console.log('Your are adding duplicate task')
-    return;
-  }
+    
   // filtering changed values:
   const taskhoursData = [...dropiddata, ...updatedRows];
   
@@ -514,14 +490,11 @@ const TaskDropDownCell = props => {
     const fetchData = async() => {
         try {
             const data1 = await PostRequestHelper('savetaskhours',taskhoursData, navigate);
-            console.log(data1);
             if(data1.status === 200){
                 setShowAlert(true);
                 setMessage(data1.message);
                 setVariant("success")
-                console.log(data1)
             }else if(data1.status === 400 || data1.status ===409){
-                console.log(data1)
             }
         } catch (err) {
             console.error('Error fetching data:', err);
@@ -529,6 +502,7 @@ const TaskDropDownCell = props => {
     }
     fetchData();
     getListing();
+    setShowCancelButton(false);
   }
   
 
@@ -546,7 +520,6 @@ const TaskDropDownCell = props => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error approving timesheet:', err);
     }
@@ -563,7 +536,7 @@ const TaskDropDownCell = props => {
                 </div>
             )}
             {showCard && (
-              <div>
+              <div style={{ paddingBottom: showAlert ? '60px' : '0' }}>
                 <CardComponent />
               </div>
             )}
@@ -607,6 +580,11 @@ const TaskDropDownCell = props => {
                 <Button title="Save" type="button" onClick={handleSaveData}>
                 Save
                 </Button>
+                {showCancelButton && (
+                  <Button title="Cancel" type="button" onClick={cancel}>
+                        Cancel
+                    </Button>
+                )}
           </GridToolbar>
         )}
           
@@ -644,13 +622,19 @@ const TaskDropDownCell = props => {
             <div className='mb-3'>
             
                    <div className="d-flex justify-content-between align-items-center mt-3">
-                    <Button
+                    {disabled && (<Button
                       themeColor={"primary"}
                       onClick={handleApprovalSubmit}
-                      disabled={disabled}
+                      disabled
                     >
                       Send for Approval
-                    </Button>
+                    </Button>)}
+                    {!disabled && (<Button
+                      themeColor={"primary"}
+                      onClick={handleApprovalSubmit}
+                    >
+                      Send for Approval
+                    </Button>)}
                   </div>
           </div>
           </div>

@@ -31,7 +31,6 @@ function NavbarComponent() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('userData');
-    console.log('Logged out successfully')
     navigate('/login');
   }
 
@@ -78,8 +77,7 @@ function NavbarComponent() {
                 show={showDropdown} // Controls visibility based on hover
                 align="end"
               >
-                <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
-                <NavDropdown.Item href="/settings">Settings</NavDropdown.Item>
+                <NavDropdown.Item href="/profile">Profile Settings</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
               </NavDropdown>

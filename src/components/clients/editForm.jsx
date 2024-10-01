@@ -28,7 +28,6 @@ const EditForm = props => {
 
   const CheckBoxField = ({ label, value, onChange, name, visited, error }) => {
     const handleChange = (e) => {
-      console.log('Checkbox Checked:', e.target.value);
       onChange({ value: e.target.value }); // Pass updated value
     };
   
