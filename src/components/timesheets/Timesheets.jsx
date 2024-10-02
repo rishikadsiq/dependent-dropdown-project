@@ -133,18 +133,15 @@ const Timesheets = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('timesheetlist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            console.log(data1)
             const updatedData = data1.timesheets.map((item, index) => ({
                 ...item, // Spread the other properties
                 new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
-            console.log(updatedData);
             
             setData(updatedData || []);
         }
@@ -176,7 +173,6 @@ const Timesheets = () => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
       } catch (err) {
         console.error('Error recalling data:', err);
       }
@@ -200,7 +196,6 @@ const Timesheets = () => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -236,17 +231,12 @@ const Timesheets = () => {
         return `${year}-${month}-${day}`;
     };
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 const formattedDate = formatDate(event.date);
-                console.log(formattedDate); // Now it should show the correct date
 
                 const data1 = await PostRequestHelper('addtimesheet', { date: formattedDate }, navigate);
-                console.log(data1);
-                console.log(data1);
                 if(data1.status === 201){
                     setMessage(data1.message)
                     setShowAlert(true)

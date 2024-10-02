@@ -3,7 +3,7 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { ComboBox } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +31,6 @@ const AddFormFromProject = (props) => {
           };
         });
         
-        console.log(updatedData)
         setProjectData(updatedData);
       }
     } catch (err) {
@@ -71,7 +70,7 @@ const AddFormFromProject = (props) => {
     return (
       <div>
         <label className="k-label">{fieldRenderProps.label}</label>
-        <DropDownList
+        <ComboBox
           data={fieldRenderProps.data}
           textField="project_name"
           dataItemKey="project_id"

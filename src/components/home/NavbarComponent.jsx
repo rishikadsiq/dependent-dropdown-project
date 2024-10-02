@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useNavigate } from 'react-router-dom';
+import { PostRequestHelper } from '../helper/PostRequestHelper';
 
 
 function NavbarComponent() {
@@ -11,7 +12,6 @@ function NavbarComponent() {
   const access_token = localStorage.getItem('access_token')
   const refresh_token = localStorage.getItem('refresh_token')
   const userData = JSON.parse(localStorage.getItem('userData'));
-
   
   React.useEffect(() => {
     if(!access_token && !refresh_token && !userData)  return navigate('/login')
@@ -27,11 +27,22 @@ function NavbarComponent() {
   const handleMouseEnter1 = () => setShowDropdown1(true);
   const handleMouseLeave1 = () => setShowDropdown1(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('userData');
-    navigate('/login');
+  const handleLogout = async() => {
+    try{
+      const data1 = await PostRequestHelper('logout',{}, navigate);
+      if(data1.status === 200){
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('guideMeClientData')
+        localStorage.removeItem('guideMeUserData')
+        localStorage.removeItem('guideMeTaskData')
+        localStorage.removeItem('guideMeProjectData')
+        navigate('/login');
+      }
+    }catch(err){
+      console.error('Error logging out:', err);
+    }
   }
 
   return (
@@ -78,6 +89,7 @@ function NavbarComponent() {
                 align="end"
               >
                 <NavDropdown.Item href="/profile">Profile Settings</NavDropdown.Item>
+                <NavDropdown.Item href="/guide-me">Guide Me</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
               </NavDropdown>

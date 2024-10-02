@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid, GridColumn as Column, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
+import { ComboBox } from '@progress/kendo-react-dropdowns';
 import {GetRequestHelper} from  '../helper/GetRequestHelper'
 import {PostRequestHelper} from  '../helper/PostRequestHelper'
 import { useNavigate } from 'react-router-dom';
@@ -194,7 +194,7 @@ const DropDownCell = props => {
   return (
       <td>
           {dataItem.inEdit ? (
-              <DropDownList
+            <ComboBox
                   style={{ width: '100px' }}
                   onChange={handleChange}
                   value={localizedData.find(c => c.id === dataValue)}
@@ -235,7 +235,7 @@ const ProjectDropDownCell = props => {
   return (
       <td>
           {dataItem.inEdit ? (
-              <DropDownList
+              <ComboBox
                   style={{ width: '100px' }}
                   onChange={handleChange}
                   value={localizedData.find(p => p.id === dataValue)}
@@ -276,7 +276,7 @@ const TaskDropDownCell = props => {
   return (
       <td>
           {dataItem.inEdit ? (
-              <DropDownList
+              <ComboBox
                   style={{ width: '100px' }}
                   onChange={handleChange}
                   value={localizedData.find(t => t.id === dataValue)}

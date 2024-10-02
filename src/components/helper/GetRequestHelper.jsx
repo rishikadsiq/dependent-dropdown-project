@@ -26,7 +26,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
   let response = await fetchWithToken(access_token);
 
   if (response?.message === 'Signature has expired') { // If the token has expired
-
+    
     const tokenRefreshResponse = await fetch(`http://localhost:5000/refreshtoken`, {
       method: "POST",
       headers: {

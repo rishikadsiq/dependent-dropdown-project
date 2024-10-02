@@ -2,14 +2,14 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Stepper = () => {
+const Stepper = ({clientComponent, projectComponent, taskComponent, userComponent}) => {
   return (
     <Container className="py-3">
       <Row className="align-items-center justify-content-center no-gutters">
         {/* Step 1 */}
         <Col xs={2} className="text-center">
           <div
-            className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto"
+            className={clientComponent ? "rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto" : "rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"}
             style={{ width: '40px', height: '40px' }}
           >
             1
@@ -27,7 +27,7 @@ const Stepper = () => {
         {/* Step 2 */}
         <Col xs={2} className="text-center">
           <div
-            className="rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"
+            className={projectComponent ? "rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto" : "rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"}
             style={{ width: '40px', height: '40px' }}
           >
             2
@@ -44,7 +44,7 @@ const Stepper = () => {
         {/* Step 3 */}
         <Col xs={2} className="text-center">
           <div
-            className="rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"
+            className={taskComponent ? "rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto" : "rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"}
             style={{ width: '40px', height: '40px' }}
           >
             3
@@ -61,7 +61,7 @@ const Stepper = () => {
         {/* Step 4 */}
         <Col xs={2} className="text-center">
           <div
-            className="rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"
+            className={userComponent ? "rounded-circle bg-success text-white d-flex align-items-center justify-content-center mx-auto" : "rounded-circle border border-danger text-dark d-flex align-items-center justify-content-center mx-auto"}
             style={{ width: '40px', height: '40px' }}
           >
             4

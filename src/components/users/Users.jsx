@@ -77,16 +77,13 @@ const Users = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('userlist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            console.log(data1)
             const updatedData = data1.users.map((item, index) => ({
                 ...item, // Spread the other properties
                 new_id: index+1
             }));
-            console.log(updatedData);
             
             setData(updatedData || []);
         }
@@ -121,7 +118,6 @@ const Users = () => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -150,13 +146,10 @@ const Users = () => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 const updatedEvent = {...event, approver_id: event.approver_id.id, supervisor_id: event.supervisor_id.id}
-                console.log(updatedEvent)
                 
                 const data1 = await PostRequestHelper('adduser', updatedEvent, navigate);
                 if(data1.status === 201){
@@ -169,7 +162,6 @@ const Users = () => {
                     setShowAlert(true)
                     setVariant("danger")
                 }
-                console.log(data1);
                 getListing()
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -180,7 +172,6 @@ const Users = () => {
     } else {
         const fetchData = async() => {
             try {
-                console.log(event);
                 const orignalData = data.find(item => item.id ===event.id);
 
                     // Function to find changed properties in the event object compared to orignalData
@@ -196,7 +187,6 @@ const Users = () => {
                   
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
-                console.log(changedData) 
                 const data1 = await PostRequestHelper('updateuser', changedData, navigate);
                 if(data1.status === 200){
                     setMessage(data1.message)
@@ -208,7 +198,6 @@ const Users = () => {
                     setShowAlert(true)
                     setVariant("danger")
                 }
-                console.log(data1);
                 getListing()
                 setOpenEditForm(false);
             } catch (err) {

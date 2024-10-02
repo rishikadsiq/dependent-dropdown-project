@@ -32,7 +32,6 @@ const ChangePassword = ({setShowButton, setMessage, setVariant, setShowAlert }) 
     };
 
     const handleSubmit = async (formData) => {
-        console.log("Reset Password form submitted", formData);
 
        try{
         const response = await PostRequestHelper('/changepassword', { new_password: formData.password, current_password: formData.current_password }, navigate)
@@ -46,7 +45,7 @@ const ChangePassword = ({setShowButton, setMessage, setVariant, setShowAlert }) 
             setVariant("danger")
         }
        }catch(err){
-        console.log("Error while updating password: " + err)
+        console.error("Error while updating password: " + err)
        }
         
 

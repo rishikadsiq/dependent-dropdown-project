@@ -3,7 +3,7 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { ComboBox } from "@progress/kendo-react-dropdowns";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { useNavigate } from "react-router-dom";
 
@@ -81,7 +81,7 @@ const AddFormTask = (props) => {
                 {!loading && (
                   <Field
                     name={"project_id"}
-                    component={DropDownList}
+                    component={ComboBox}
                     data={projectData}
                     textField="project_name"
                     dataItemKey="project_id"

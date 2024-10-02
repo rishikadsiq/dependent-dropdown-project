@@ -3,7 +3,7 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { ComboBox } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { RadioGroup } from "@progress/kendo-react-inputs";
 import { Checkbox } from "@progress/kendo-react-inputs"
@@ -81,7 +81,7 @@ const EditForm = (props) => {
     return (
       <div>
         <label className="k-label">{fieldRenderProps.label}</label>
-        <DropDownList
+        <ComboBox
           data={fieldRenderProps.data}
           textField="approver_name"
           dataItemKey="approver_id"
@@ -105,7 +105,7 @@ const EditForm = (props) => {
     return (
       <div>
         <label className="k-label">{fieldRenderProps.label}</label>
-        <DropDownList
+        <ComboBox
           data={fieldRenderProps.data}
           textField="supervisor_name"
           dataItemKey="supervisor_id"
@@ -122,7 +122,6 @@ const EditForm = (props) => {
 
   const CheckBoxField = ({ label, value, onChange, name, visited, error }) => {
     const handleChange = (e) => {
-      console.log('Checkbox Checked:', e.target.value);
       onChange({ value: e.target.value }); // Pass updated value
     };
   

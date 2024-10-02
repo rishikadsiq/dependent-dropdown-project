@@ -3,7 +3,7 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { ComboBox } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../../helper/GetRequestHelper";
 import { RadioGroup } from "@progress/kendo-react-inputs";
 import { useNavigate } from "react-router-dom";
@@ -124,7 +124,7 @@ const AddFormUser = (props) => {
                 {!loading && (
                   <Field
                     name={"approver_id"}
-                    component={DropDownList}
+                    component={ComboBox}
                     data={userData}
                     textField="name"
                     dataItemKey="approver_id"
@@ -137,7 +137,7 @@ const AddFormUser = (props) => {
                 {!loading && (
                   <Field
                     name={"supervisor_id"}
-                    component={DropDownList}
+                    component={ComboBox}
                     data={userData}
                     textField="name"
                     dataItemKey="supervisor_id"

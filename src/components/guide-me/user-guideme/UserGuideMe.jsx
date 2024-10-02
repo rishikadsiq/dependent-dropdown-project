@@ -6,7 +6,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { useNavigate } from "react-router-dom";
 import AddFormUser from './AddFormUser'
 
-const Users = ({setUserComponent, setTaskComponent}) => {
+const Users = ({setUserComponent, setTaskComponent, toggleWindow}) => {
     const [openAddForm, setOpenAddForm] = React.useState(false);
     const [editItem, setEditItem] = React.useState({
         id: 1
@@ -21,7 +21,11 @@ const Users = ({setUserComponent, setTaskComponent}) => {
     const getListing = () => {
       const localData = JSON.parse(localStorage.getItem('guideMeUserData'));
       if (localData) {
-        setData(localData);
+        const updatedData = localData.map((user, index) => ({
+          ...user,
+          new_id: index + 1,
+        }))
+        setData(updatedData);
       }
     }
 
@@ -138,7 +142,8 @@ const toggleConflictDialog = () => {
                         <Button onClick={() => {
                           setOpenSuccessDialog(false)
                           setUserComponent(false)
-                          navigate('/')
+                          
+                          toggleWindow()
                         }}>Close Guide</Button>
                     </DialogActionsBar>
                 </Dialog>
@@ -156,7 +161,7 @@ const toggleConflictDialog = () => {
                         <Button onClick={() => {
                           setOpenConflictDialog(false)
                           setUserComponent(false)
-                          navigate('/')
+                          toggleWindow()
                         }}>Close Guide</Button>
                     </DialogActionsBar>
                 </Dialog>

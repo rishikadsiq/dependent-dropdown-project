@@ -3,7 +3,7 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 import { Form, Field, FormElement } from "@progress/kendo-react-form";
 import { Input } from "@progress/kendo-react-inputs";
 import { Button } from "@progress/kendo-react-buttons";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
+import { ComboBox } from "@progress/kendo-react-dropdowns";
 import { GetRequestHelper } from "../helper/GetRequestHelper";
 import { DatePicker } from "@progress/kendo-react-dateinputs";
 import { useNavigate } from "react-router-dom";
@@ -71,11 +71,11 @@ const AddForm = (props) => {
                 {!loading && (
                   <Field
                     name={"client_id"}
-                    component={DropDownList}
+                    component={ComboBox}
                     data={clientData}
                     textField="name"
                     dataItemKey="client_id"
-                    label="Client Name"
+                    label="Client Name *"
                     validator={requiredValidator}
                   />
                 )}

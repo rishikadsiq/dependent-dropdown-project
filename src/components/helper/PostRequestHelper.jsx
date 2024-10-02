@@ -11,6 +11,21 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
     navigate('/login'); // Navigate to the login page
     return;
   }
+  if(endpoint==='uploadprofile'){
+    const fetchWithToken = async (token) => {
+      const response = await fetch(`http://localhost:5000/${endpoint}`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body:dataItem, // Send dataItem in request body
+      });
+      const data = await response.json();
+      return data;
+    };
+    let response = await fetchWithToken(access_token);
+    return response;
+  }
 
   // Helper function to perform the POST request
   const fetchWithToken = async (token) => {
@@ -28,10 +43,8 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
 
   // First attempt with the current access token
   let response = await fetchWithToken(access_token);
-  console.log(response)
 
-  if (response.message === 'Signature has expired') { // If the access token has expired
-    console.log("Access token expired. Attempting to refresh token...");
+  if (response.message === 'Signature has expired') { 
 
     // Attempt to refresh the token
     const tokenRefreshResponse = await fetch(`http://localhost:5000/refreshtoken`, {

@@ -29,7 +29,7 @@ const Profile = () => {
     setSelectedFile(event.target.files[0]);
   };
 
-  const handleUpload = () => {
+  const handleUpload = async() => {
     if (!selectedFile) {
       alert('Please choose a file first!');
       return;
@@ -37,11 +37,17 @@ const Profile = () => {
 
     const formData = new FormData();
     formData.append('file', selectedFile);
-
-    alert(`File ${selectedFile.name} uploaded successfully!`);
+    const response = await PostRequestHelper('uploadprofile', formData, navigate)
+    console.log(response)
+    if(response.status===200){
+      setMessage(response.message)
+      setShowAlert(true)
+      setVariant("success")
+    }
 
     setSelectedFile(null);
     fileInputRef.current.value = ''; // Clear the file input
+    fetchData()
   };
 
   const CircularImage = ({ src, alt }) => {
@@ -102,14 +108,12 @@ const Profile = () => {
       return acc;
     }, {});
   
-    console.log('Changed Profile Data:', changedData);
     const response = await PostRequestHelper('/updateprofile', changedData, navigate)
     if(response.status===200){
       setMessage(response.message)
       setShowAlert(true)
       setVariant("success")
     }
-    console.log(response)
   
     // Update the state with the new data
     fetchData()
@@ -121,8 +125,8 @@ const Profile = () => {
 
   const fetchData = async () => {
     const response = await GetRequestHelper('/getprofile', navigate);
-    console.log(response.data);
     setData(response.data || {});
+    console.log(response.data.url)
   };
 
   useEffect(() => {
@@ -146,7 +150,7 @@ const Profile = () => {
         <p style={{ fontSize: '0.6em', marginLeft: '10px' }}>Formats: png, jpg, gif. Max size: 1 MB.</p>
         <div style={styles.profilePhotoContainer}>
           <span>
-            <CircularImage src="https://via.placeholder.com/150" alt="Example" />
+            <CircularImage src={data.url} alt="Example" />
           </span>
           <span>
             <Form.Group controlId="formFile" className="mb-3">

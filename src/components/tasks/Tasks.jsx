@@ -95,18 +95,15 @@ const Tasks = () => {
   const getListing = async() => {
     try {
         const data1 = await GetRequestHelper('tasklist', navigate);
-        console.log(data1);
         if (data1.status === 404) {
             setData([]);
         } else {
-            console.log(data1)
             const updatedData = data1.tasks.map((item, index) => ({
                 ...item, // Spread the other properties
                 new_id: index+1,
                 start_date: item.start_date ? new Date(item.start_date) : null,
                 end_date: item.end_date ? new Date(item.end_date) : null,
             }));
-            console.log(updatedData);
             
             setData(updatedData || []);
         }
@@ -158,7 +155,6 @@ const addNewFromProjects = (localdata) => {
             setShowAlert(true)
             setVariant("danger")
         }
-        console.log(response);
     } catch (err) {
         console.error('Error deleting data:', err);
     }
@@ -187,11 +183,9 @@ const addNewFromProjects = (localdata) => {
         return item;
       });
     if (newItem) {
-        console.log(event)
         const fetchData = async() => {
             try {
                 delete event.id
-                console.log(event);
                 let updatedEvent = {}
                 if(event.project_id.id){
                    updatedEvent = {...event, project_id: event.project_id.id}
@@ -199,10 +193,8 @@ const addNewFromProjects = (localdata) => {
                     updatedEvent = {...event}
                 }
                 
-                console.log(updatedEvent)
                 localStorage.setItem('to_be_add', JSON.stringify(updatedEvent));
                 const data1 = await PostRequestHelper('addtask', updatedEvent, navigate);
-                console.log(data1);
                 if(data1.status === 201){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -229,7 +221,6 @@ const addNewFromProjects = (localdata) => {
     } else {
         const fetchData = async() => {
             try {
-                console.log(event);
                 const orignalData = data.find(item => item.id ===event.id);
 
                     // Function to find changed properties in the event object compared to orignalData
@@ -245,9 +236,7 @@ const addNewFromProjects = (localdata) => {
                     const changedData = getChangedData(orignalData, event);
                     changedData['id'] = event.id;
                     localStorage.setItem('to_be_add', JSON.stringify(changedData));
-                console.log(changedData) 
                 const data1 = await PostRequestHelper('updatetask', changedData, navigate);
-                console.log(data1);
                 if(data1.status === 200){
                     setMessage(data1.message)
                     setShowAlert(true)
@@ -296,7 +285,6 @@ const addNewFromProjects = (localdata) => {
             if (toBeAdded) {
                 const parsedData = JSON.parse(toBeAdded)
                 const response = await PostRequestHelper('addduplicatetask', parsedData, navigate)
-                console.log(response)
                 if(response.status === 201 || response.status ===200) {
                         setMessage(response.message)
                         setShowAlert(true)
