@@ -15,9 +15,19 @@ import ResetPassword from './components/authentication/ResetPassword';
 import Profile from './components/users/Profile';
 import GuideMe from './components/guide-me/GuideMe';
 import NotFound from './components/not-found/NotFound';
+import { useEffect, useState } from 'react';
 
 
-const AppRoutes = () => (
+const AppRoutes = () => {
+    const [role, setRole] = useState("")
+    useEffect(() => {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if(userData){
+            setRole(userData.role)
+        }
+    },[])
+    
+    return (
     <Router>
         <Routes>
             {/* Auth Urls */}
@@ -31,20 +41,29 @@ const AppRoutes = () => (
 
             <Route path="*" element={<NotFound />} />
             <Route path='/' element={<Home />} />
-            <Route path='/clients' element={<Clients />} />
-            <Route path='/projects' element={<Projects />} />
-            <Route path='/tasks' element={<Tasks />} />
+
+            {role==="Admin" && (
+                <>
+                    <Route path='/clients' element={<Clients />} />
+                    <Route path='/projects' element={<Projects />} />
+                    <Route path='/tasks' element={<Tasks />} />
+                    <Route path='/users' element={<Users />} />
+                    <Route path='/guide-me' element={<GuideMe />} />
+                </>
+            )}
+
+            
             <Route path='/timesheets' element={<Timesheets />} />
-            <Route path='/users' element={<Users />} />
             <Route path='/timesheet/:timesheetId' element={<TaskHour />} />
             <Route path='/approvals' element={<Approvals />} />
             <Route path='/approval/:timesheetId' element={<ApprovalTimesheet />} />
-            <Route path='/guide-me' element={<GuideMe />} />
+            
 
             <Route path='/profile' element={<Profile />} />
             {/* <Route path='/compress' element={<Compression />} /> */}
         </Routes>
     </Router>
-);
+    )
+};
 
 export default AppRoutes;
