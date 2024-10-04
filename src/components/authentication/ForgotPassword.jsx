@@ -19,7 +19,7 @@ const ForgotPassword = () => {
   const [variant, setVariant] = React.useState(null)
 
   const handleSubmit = async (formData) => {
-    const response = await fetch('http://localhost:5000/forgotpassword', {
+    const response = await fetch('http://dev-api.timechronos.com/forgotpassword', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

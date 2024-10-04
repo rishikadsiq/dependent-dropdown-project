@@ -29,7 +29,7 @@ const ResetPassword = () => {
 
     const handleSubmit = async (formData) => {
 
-        const response = await fetch(`http://127.0.0.1:5000/resetpassword?token=${code}`, {
+        const response = await fetch(`http://dev-api.timechronos.com/resetpassword?token=${code}`, {
             method: 'POST',
             body: JSON.stringify({ password: formData.password }),
             headers: { "Content-Type": "application/json" },

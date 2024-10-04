@@ -12,7 +12,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
   }
 
   const fetchWithToken = async (access_token) => {
-    const response = await fetch(`http://localhost:5000/${endpoint}`, {
+    const response = await fetch(`http://dev-api.timechronos.com/${endpoint}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const GetRequestHelper = async (endpoint, navigate) => {
 
   if (response?.message === 'Signature has expired') { // If the token has expired
     
-    const tokenRefreshResponse = await fetch(`http://localhost:5000/refreshtoken`, {
+    const tokenRefreshResponse = await fetch(`http://dev-api.timechronos.com/refreshtoken`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
