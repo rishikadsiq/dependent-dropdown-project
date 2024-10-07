@@ -13,7 +13,7 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
   }
   if(endpoint==='uploadprofile'){
     const fetchWithToken = async (token) => {
-      const response = await fetch(`http://dev-api.timechronos.com/${endpoint}`, {
+      const response = await fetch(`${domain}/${endpoint}`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`
@@ -29,7 +29,7 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
 
   // Helper function to perform the POST request
   const fetchWithToken = async (token) => {
-    const response = await fetch(`http://dev-api.timechronos.com/${endpoint}`, {
+    const response = await fetch(`${domain}/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
   if (response.message === 'Signature has expired') { 
 
     // Attempt to refresh the token
-    const tokenRefreshResponse = await fetch(`http://dev-api.timechronos.com/refreshtoken`, {
+    const tokenRefreshResponse = await fetch(`${domain}/refreshtoken`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

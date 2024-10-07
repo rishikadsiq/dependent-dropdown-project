@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   FormInput,
 } from './form-components'
+import {domain} from '../../config'
 
 import {
   emailValidator,
@@ -17,9 +18,10 @@ const ForgotPassword = () => {
   const [showAlert, setShowAlert] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const [variant, setVariant] = React.useState(null)
+  console.log(domain)
 
   const handleSubmit = async (formData) => {
-    const response = await fetch('http://dev-api.timechronos.com/forgotpassword', {
+    const response = await fetch(`${domain}/forgotpassword`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

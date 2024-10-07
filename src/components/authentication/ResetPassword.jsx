@@ -7,6 +7,7 @@ import { FormInput } from './form-components';
 import { passwordValidator } from './validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // 
+import { domain } from '../../config';
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ const ResetPassword = () => {
 
     const handleSubmit = async (formData) => {
 
-        const response = await fetch(`http://dev-api.timechronos.com/resetpassword?token=${code}`, {
+        const response = await fetch(`${domain}/resetpassword?token=${code}`, {
             method: 'POST',
             body: JSON.stringify({ password: formData.password }),
             headers: { "Content-Type": "application/json" },

@@ -13,6 +13,7 @@ import {
   emailValidator,
 } from './validators'
 import Alerts from '../dynamic-compoenents/Alerts';
+import { domain } from '../../config';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Login = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      const fetchData = await fetch("http://dev-api.timechronos.com/login", {
+      const fetchData = await fetch(`${domain}/login`, {
         method: 'POST',
         body: JSON.stringify({
           email: formData.email,

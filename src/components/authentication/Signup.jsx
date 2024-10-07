@@ -32,7 +32,7 @@ const Signup = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const response = await fetch("http://dev-api.timechronos.com/register", {
+    const response = await fetch(`${domain}/register`, {
       method: 'POST',
       body: JSON.stringify({
         company_name: formData.company_name,
