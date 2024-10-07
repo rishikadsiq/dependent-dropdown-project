@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useRef, useEffect } from 'react';
 import HeaderLayout from '../home/HeaderLayout';
 import { Button } from '@progress/kendo-react-buttons';
@@ -12,6 +9,9 @@ import { GetRequestHelper } from '../helper/GetRequestHelper';
 import { PostRequestHelper } from '../helper/PostRequestHelper';
 import ChangePassword from './ChangePassword';
 import Alerts from '../dynamic-compoenents/Alerts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { Tab, Tabs } from 'react-bootstrap';
 
 const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -38,7 +38,6 @@ const Profile = () => {
     const formData = new FormData();
     formData.append('file', selectedFile);
     const response = await PostRequestHelper('uploadprofile', formData, navigate)
-    console.log(response)
     if(response.status===200){
       setMessage(response.message)
       setShowAlert(true)
@@ -126,7 +125,6 @@ const Profile = () => {
   const fetchData = async () => {
     const response = await GetRequestHelper('/getprofile', navigate);
     setData(response.data || {});
-    console.log(response.data.url)
   };
 
   useEffect(() => {
@@ -166,13 +164,10 @@ const Profile = () => {
       </div>
       <hr style={{ border: '1px solid #000', margin: '20px 0' }} />
       <div style={{ paddingLeft: '10px' }}>
-        <h6>Personal Info </h6>
-        <div className="flex my-3">
-          {!isEditable && (
-            <Button themeColor={'primary'} style={{ paddingTop: '3px' }} size={'small'} onClick={handleEdit}>
-              Edit
-            </Button>
-          )}
+      <Tabs defaultActiveKey="personal-info" id="tab-example" className="mb-3">
+      <Tab eventKey="personal-info" title="Personal Info">
+        <div>
+        <div className="flex my-3" style={{height: "20px"}}>
           {isEditable && (
             <>
               <Button
@@ -194,7 +189,14 @@ const Profile = () => {
         <Row className="mb-3">
             <Col sm="6">
               <Form.Group controlId="formPlaintextFirstName">
-                <Form.Label>First Name</Form.Label>
+              <Form.Label>
+                  First Name 
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={handleEdit}
+                    style={{ cursor: 'pointer', marginLeft: '10px' }}
+                  />
+                </Form.Label>
                 {isEditable ? (
                   <Form.Control
                     type="text"
@@ -210,7 +212,14 @@ const Profile = () => {
 
             <Col sm="6">
               <Form.Group controlId="formPlaintextLastName">
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>
+                  Last Name 
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={handleEdit}
+                    style={{ cursor: 'pointer', marginLeft: '10px' }}
+                  />
+                </Form.Label>
                 {isEditable ? (
                   <Form.Control
                     type="text"
@@ -255,9 +264,14 @@ const Profile = () => {
           <Row className="mb-3">
             <Col sm="6">
               <Form.Group controlId="formPlaintextPhone">
-                <Form.Label column sm="2">
-                  Contact
-                </Form.Label>
+                  <Form.Label>
+                    Phone 
+                    <FontAwesomeIcon
+                      icon={faEdit}
+                      onClick={handleEdit}
+                      style={{ cursor: 'pointer', marginLeft: '10px' }}
+                    />
+                  </Form.Label>
                   {isEditable ? (
                     <Form.Control
                       type="text"
@@ -273,9 +287,14 @@ const Profile = () => {
 
             <Col sm="6">
               <Form.Group controlId="formPlaintextDOB">
-                <Form.Label column sm="4">
-                  Date of Birth
-                </Form.Label>
+                  <Form.Label>
+                    Date of Birth
+                    <FontAwesomeIcon
+                      icon={faEdit}
+                      onClick={handleEdit}
+                      style={{ cursor: 'pointer', marginLeft: '10px' }}
+                    />
+                  </Form.Label>
                   {isEditable ? (
                     <Form.Control
                       type="date"
@@ -293,20 +312,24 @@ const Profile = () => {
           <Row className="mb-3">
             <Col sm="6">
               <Form.Group controlId="formPlaintextAddress">
-                <Form.Label column sm="2">
-                  Address
+                  <Form.Label>
+                  Address 
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    onClick={handleEdit}
+                    style={{ cursor: 'pointer', marginLeft: '10px' }}
+                  />
                 </Form.Label>
-                
-                  {isEditable ? (
-                    <Form.Control
-                      type="text"
-                      name="address"
-                      value={formData.address || ''}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <Form.Control readOnly value={data.address || ''} />
-                  )}
+                {isEditable ? (
+                  <Form.Control
+                    type="text"
+                    name="address"
+                    value={formData.address || ''}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  <Form.Control readOnly value={data.address || ''} />
+                )}
               </Form.Group>
             </Col>
 
@@ -349,20 +372,13 @@ const Profile = () => {
             </Col>
           </Row>
         </Form>
-      </div>
-      <hr style={{ border: '1px solid #000', margin: '20px 0' }} />
-      <div style={{ paddingLeft: '10px' }}>
-        <h6>Security & Privacy</h6>
-        {
-          !showButton && (
-            <Button themeColor={'primary'} className='my-2' size={'small'} onClick={() => setShowButton(true)}>
-            Change Password
-          </Button>
-          )
-        }
-         {showButton && (
+        </div>
+        </Tab>
+ 
+      <Tab eventKey="security" title="Security & Privacy">
           <ChangePassword setShowButton={setShowButton} setShowAlert={setShowAlert} setMessage={setMessage} setVariant={setVariant} />
-         )}
+        </Tab>
+      </Tabs>
       </div>
     </HeaderLayout>
   );

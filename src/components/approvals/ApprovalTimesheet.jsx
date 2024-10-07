@@ -98,7 +98,6 @@ const ApprovalTimesheet = () => {
             </div>
             <div className='mb-3'>
             <Grid data={timesheetData}>
-                <Column field="timesheet_id" title="ID" />
                 <Column field='timesheet_name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>

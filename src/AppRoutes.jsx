@@ -1,22 +1,22 @@
+import * as  React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Clients from './components/clients/Clients';
-import Projects from './components/projects/Projects';
-import Tasks from './components/tasks/Tasks';
-import Users from './components/users/Users';
-import Timesheets from './components/timesheets/Timesheets';
-import Signup from './components/authentication/Signup';
-import Login from './components/authentication/Login';
-import Home from './components/home/Home';
-import TaskHour from './components/taskhours/TaskHour'
-import ForgotPassword from './components/authentication/ForgotPassword';
-import Approvals from './components/approvals/Approvals';
-import ApprovalTimesheet from './components/approvals/ApprovalTimesheet';
-import ResetPassword from './components/authentication/ResetPassword';
-import Profile from './components/users/Profile';
-import GuideMe from './components/guide-me/GuideMe';
-import NotFound from './components/not-found/NotFound';
 import { useEffect, useState } from 'react';
-
+import NotFound from './components/not-found/NotFound'
+import GuideMe from './components/guide-me/GuideMe'
+import  Profile from './components/users/Profile'
+import  ResetPassword from './components/authentication/ResetPassword'
+import  ApprovalTimesheet from './components/approvals/ApprovalTimesheet'
+import  ForgotPassword from './components/authentication/ForgotPassword'
+import  TaskHour from './components/taskhours/TaskHour'
+import  Approvals from './components/approvals/Approvals'
+import  Home from './components/home/Home'
+import  Login from './components/authentication/Login'
+import  Signup from './components/authentication/Signup'
+import  Timesheets from './components/timesheets/Timesheets'
+import  Users from './components/users/Users'
+import  Tasks from './components/tasks/Tasks'
+import  Projects from './components/projects/Projects'
+import  Clients from './components/clients/Clients'
 
 const AppRoutes = () => {
     const [role, setRole] = useState("")
@@ -26,7 +26,7 @@ const AppRoutes = () => {
             setRole(userData.role)
         }
     },[])
-    
+
     return (
     <Router>
         <Routes>
@@ -60,7 +60,6 @@ const AppRoutes = () => {
             
 
             <Route path='/profile' element={<Profile />} />
-            {/* <Route path='/compress' element={<Compression />} /> */}
         </Routes>
     </Router>
     )

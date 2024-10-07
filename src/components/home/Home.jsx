@@ -47,7 +47,6 @@ const Home = () => {
         if (data1.status === 404) {
             setData([]);
         } else {
-          console.log(data1)
             setData(data1.stats_data);
           }
         } catch (error) {

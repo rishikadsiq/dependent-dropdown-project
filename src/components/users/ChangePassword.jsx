@@ -61,19 +61,7 @@ const ChangePassword = ({setShowButton, setMessage, setVariant, setShowAlert }) 
                         <Form onSubmit={handleSubmit} render={formRenderProps =>
                             <FormElement>
                                 <fieldset className={'k-form-fieldset'}>
-                                    <div className="k-form-buttons">
-                                            <Button
-                                                themeColor={"primary"}
-                                                type={"submit"}
-                                                disabled={!formRenderProps.allowSubmit}
-                                            >
-                                                Save Password
-                                            </Button>
-                                            <Button onClick={() => {
-                                                formRenderProps.onFormReset()
-                                                setShowButton(false)
-                                            }}>Cancel</Button>
-                                        </div>
+                                    
                                     {/* Password Field */}
                                     <div className="position-relative">
                                         <Field
@@ -146,7 +134,19 @@ const ChangePassword = ({setShowButton, setMessage, setVariant, setShowAlert }) 
                                         <FontAwesomeIcon icon={showRetypePassword ? faEyeSlash : faEye} />
                                         </button>
                                     </div>
-                                   
+                                    <div className="k-form-buttons">
+                                            <Button
+                                                themeColor={"primary"}
+                                                type={"submit"}
+                                                disabled={!formRenderProps.allowSubmit}
+                                            >
+                                                Save Password
+                                            </Button>
+                                            <Button onClick={() => {
+                                                formRenderProps.onFormReset()
+                                                setShowButton(false)
+                                            }}>Cancel</Button>
+                                        </div>
                                 </fieldset>
                             </FormElement>}
                         />

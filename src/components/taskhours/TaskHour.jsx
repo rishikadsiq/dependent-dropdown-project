@@ -133,7 +133,12 @@ const TaskHour = () => {
   
 
   React.useEffect(() => {
-    const handleApprovalButton = Object.values(sums).every(day => day >= 8);
+    const handleApprovalButton = 
+    sums.mon >= 8 &&
+    sums.tue >= 8 &&
+    sums.wed >= 8 &&
+    sums.thu >= 8 &&
+    sums.fri >= 8;
     setDisabled(!handleApprovalButton);
   }, [sums]);
 
@@ -547,7 +552,6 @@ const TaskDropDownCell = props => {
             </div>
             <div className='mb-3'>
             <Grid data={timesheetData}>
-                <Column field="timesheet_id" title="ID" />
                 <Column field='timesheet_name' title='Timesheet Name' />
                 <Column field='start_date' title='Start Date' format="{0:d}"/>
                 <Column field='end_date' title='End Date' format="{0:d}"/>
