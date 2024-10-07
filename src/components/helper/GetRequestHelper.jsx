@@ -1,4 +1,4 @@
-
+import { domain } from '../../config';
 export const GetRequestHelper = async (endpoint, navigate) => {
 
   let access_token = localStorage.getItem('access_token');

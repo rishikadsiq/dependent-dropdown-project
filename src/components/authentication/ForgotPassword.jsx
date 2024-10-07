@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   FormInput,
 } from './form-components'
-import {domain} from '../../config'
+import { domain } from '../../config';
 
 import {
   emailValidator,

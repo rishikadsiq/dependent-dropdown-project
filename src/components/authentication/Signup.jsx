@@ -9,6 +9,7 @@ import { FormInput, FormMaskedTextBox } from './form-components';
 import { requiredValidator, emailValidator, passwordValidator, phoneValidator } from './validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // Import Font Awesome icons
+import { domain } from '../../config';
 
 const Signup = () => {
   const navigate = useNavigate();
