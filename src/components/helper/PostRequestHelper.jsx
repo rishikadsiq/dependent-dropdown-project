@@ -1,4 +1,4 @@
-
+import { domain } from '../../config';
 
 export const PostRequestHelper = async (endpoint, dataItem, navigate) => {
 
